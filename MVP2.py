@@ -128,13 +128,15 @@ def extract_zip_from_address(address):
 
 # Function to get latitude and longitude from an address or zip code
 def get_lat_lon_from_zip(address_or_zip):
-    # Localize the search to St. Gallen if it's a zip code
+    geolocator = Nominatim(user_agent="http")
+
+    # Check if input is a zip code and localize to St. Gallen if so
     if address_or_zip.isdigit() and len(address_or_zip) == 4:
         search_query = f"{address_or_zip}, St. Gallen, Switzerland"
     else:
+        # If it's a full address, search as is
         search_query = address_or_zip + ", St. Gallen, Switzerland"
 
-    geolocator = Nominatim(user_agent="http")
     location = geolocator.geocode(search_query)
     if location:
         return location.latitude, location.longitude
@@ -162,7 +164,7 @@ if extracted_zip_code == "non-specific":
     st.error("Please enter a more specific address or zip code in St. Gallen.")
     lat, lon = default_lat, default_lon  # Reset to standard coordinates of St. Gallen
 elif extracted_zip_code:
-    # Update coordinates based on the input (address or zip code)
+    # Get lat, lon based on either the full address or zip code
     lat, lon = get_lat_lon_from_zip(address_input)
 else:
     st.write("Please enter a valid address or zip code in St. Gallen.")
@@ -181,7 +183,7 @@ if address_input and extracted_zip_code:
 
 folium_static(map)
 
-# Vorhersagefunktionalität nur aktivieren, wenn eine gültige Postleitzahl vorliegt
+# Vorhersagefunktionalität nur aktiviert, wenn eine gültige Postleitzahl vorliegt
 if extracted_zip_code and not extracted_zip_code == "non-specific":
     room_options = list(range(1, 7))  # Liste von 1 bis 6
     rooms = st.selectbox("Select the number of rooms", room_options)

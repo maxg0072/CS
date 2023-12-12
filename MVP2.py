@@ -157,7 +157,7 @@ if extracted_zip_code:
         folium_static(map)
 
         # Dropdown für Zimmer und Eingabe für Quadratmeter
-        room_options = list(range(1, 7, 0.5))  # Liste von 1 bis 6
+        room_options = list(range(1, 7,))  # Liste von 1 bis 6
         rooms = st.selectbox("Select the number of rooms", room_options)
         size_m2 = st.number_input("Enter the size in square meters", min_value=0)
 

@@ -162,7 +162,13 @@ else:
 
 # Karte anzeigen
 map = folium.Map(location=[lat, lon], zoom_start=16)
-folium.Marker([lat, lon]).add_to(map)
+# Marker mit benutzerdefinierter Farbe und Popup hinzufügen
+folium.Marker(
+    [lat, lon],
+    popup=f"Eingegebene Adresse: {address_input}",
+    icon=folium.Icon(color='Red')
+      # Sie können die Farbe ändern
+).add_to(map)
 folium_static(map)
 
 # Vorhersagefunktionalität nur aktivieren, wenn eine gültige Postleitzahl vorliegt

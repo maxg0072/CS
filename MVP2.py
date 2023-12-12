@@ -148,11 +148,16 @@ if st.button('Predict Rental Price'):
                     current_col = col1 if index % 2 == 0 else col2
                     with current_col:
                         website_url = row['Websiten'].lstrip('/')
+                        address = row['Col4'] if 'Col4' in row and row['Col4'] else 'Information not available'
+                        rooms_info = row['Rooms'] if 'Rooms' in row and row['Rooms'] else 'Information not available'
+
                         st.markdown(
                             f"<div style='border: 1px solid grey; border-radius: 5px; padding: 10px;'>"
                             f"<b>Typ:</b> {row['Property_Type']} <br>"
+                            f"<b>Zimmer:</b> {rooms_info} <br>"
                             f"<b>Größe:</b> {row['Size_m2']} Quadratmeter <br>"
                             f"<b>Preis:</b> CHF {row['price_per_month']} pro Monat <br>"
+                            f"<b>Adresse:</b> {address} <br>"
                             f"<b>Ort:</b> {row['area_code']} <br>"
                             f"<b>Website:</b> <a href='http://{website_url}' target='_blank'>Link</a>"
                             f"</div>",
@@ -160,6 +165,7 @@ if st.button('Predict Rental Price'):
                         )
             else:
                 st.write("Keine ähnlichen Immobilien gefunden.")
+
 
 
 

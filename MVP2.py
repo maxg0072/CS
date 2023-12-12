@@ -186,10 +186,13 @@ num_steps = 5
 tab_titles = ["Location", "Rooms", "Size", "My Current Rent", "Results"]
 tabs = st.tabs(tab_titles)
 
+# Update the tab based on current step
+current_tab = tabs[st.session_state.current_step]
+
 # Step 1: Location
 if st.session_state.current_step == 0:
     with tabs[0]:
-        address_input = st.text_input("Enter an address or zip code in St. Gallen:", key="address_input_step1")
+        address_input = st.text_input("Please enter an address or zip code in St. Gallen:", key="address_input_step1")
 
         # Only perform checks if an address has been entered
         if address_input:
@@ -246,8 +249,8 @@ elif st.session_state.current_step == 4:
         else:
             st.error("Please enter all required information in the previous steps.")
 
-# Placing the navigation buttons outside and below the tab system
-st.markdown("---")  # Optional line to separate the content from the buttons
+# Navigation Buttons
+st.markdown("---")
 col1, col2 = st.columns(2)
 
 with col1:
@@ -259,3 +262,7 @@ with col2:
     if st.session_state.current_step < num_steps - 1:
         if st.button("Next", key="next_button"):
             st.session_state.current_step += 1
+
+# Update the selected tab after the button click
+if st.session_state.current_step != current_tab.index:
+    st.experimental_rerun()

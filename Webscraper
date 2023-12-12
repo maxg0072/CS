@@ -21,7 +21,7 @@ headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/
 all_data = []
 
 # Schleife über die Seitenzahlen
-for page in range(1,2):  # Ändern Sie 5 auf die tatsächliche Anzahl der Seiten + 1
+for page in range(1,19):  # Ändern Sie 5 auf die tatsächliche Anzahl der Seiten + 1
     if page == 1:
         url = base_url + params  # URL für die erste Seite
     else:

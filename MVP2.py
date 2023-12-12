@@ -14,14 +14,12 @@ def find_similar_properties(input_rooms, input_size, data, threshold=10):
     ]
     return similar_properties
 
-
 # Backend Code: Data Preprocessing and Model Training
 def preprocess_and_train():
-    # Load the dataset (replace with your actual file path)
-    real_estate_data = pd.read_excel('real-estate-scraped-data.xlsx')
+    # Lade die aktualisierte Datendatei
+    real_estate_data = pd.read_excel('real-estate-scraped-data (1).xlsx')
 
-    # Data Preprocessing
-    # Define the function to split 'Col3'
+    # Datenverarbeitung
     def split_column(row):
         parts = row.split(' • ')
         property_type = parts[0]
@@ -29,44 +27,37 @@ def preprocess_and_train():
         size_m2 = parts[2] if len(parts) > 2 else None
         return {'Property_Type': property_type, 'Rooms': rooms, 'Size_m2': size_m2}
 
-    # Apply the function to each row in 'Col3' and create a new DataFrame
     split_data = real_estate_data['Col3'].apply(split_column).apply(pd.Series)
 
-    # Cleaning and renaming columns
+    # Bereinige und benenne Spalten um
     real_estate_data['area_code'] = real_estate_data['Col4'].str.extract(r'\b(\d{4})\b')
-
-    # Extracting numeric values from 'Col5' and 'Col6'
     real_estate_data['price_per_month'] = real_estate_data['Col5'].str.extract(r'(\d+[\’\']?\d*)')[0].str.replace("’", "").str.replace("'", "").str.strip()
     real_estate_data['price_per_m2_per_year'] = real_estate_data['Col6'].str.extract(r'(\d+[\’\']?\d*)')[0].str.replace("’", "").str.replace("'", "").str.strip()
 
-    # Remove 'Zi.' from 'Rooms' and 'm²' from 'Size_m2', with checks for non-string data
-    split_data['Rooms'] = split_data['Rooms'].str.replace(' Zi.', '').str.strip() if split_data['Rooms'].dtype == "object" else split_data['Rooms']
-    split_data['Size_m2'] = split_data['Size_m2'].str.replace(' m²', '').str.strip() if split_data['Size_m2'].dtype == "object" else split_data['Size_m2']
+    # Entferne 'Zi.' und 'm²'
+    split_data['Rooms'] = split_data['Rooms'].str.replace(' Zi.', '').str.strip()
+    split_data['Size_m2'] = split_data['Size_m2'].str.replace(' m²', '').str.strip()
 
-    # Concatenate the new DataFrame with the original one, now including cleaned columns
-    real_estate_data = pd.concat([split_data, real_estate_data.drop(columns=['Col3', 'Col4', 'Col5', 'Col6'])], axis=1)
+    # Füge die neue Spalte "websiten" hinzu
+    real_estate_data['Websiten'] = real_estate_data['websiten']
 
-    # Rearrange columns
-    new_columns = ['Property_Type', 'Rooms', 'Size_m2', 'area_code', 'price_per_month', 'price_per_m2_per_year']
-    real_estate_data = real_estate_data[new_columns]
+    # Kombiniere die Daten
+    real_estate_data = pd.concat([split_data, real_estate_data.drop(columns=['Col3', 'Col4', 'Col5', 'Col6', 'websiten'])], axis=1)
 
-    real_estate_data.dropna(inplace=True)
-
-    # Convert columns to numeric as necessary
+    # Wandle Spalten in numerische Werte um
     real_estate_data['Rooms'] = pd.to_numeric(real_estate_data['Rooms'], errors='coerce')
     real_estate_data['Size_m2'] = pd.to_numeric(real_estate_data['Size_m2'], errors='coerce')
     real_estate_data['area_code'] = pd.to_numeric(real_estate_data['area_code'], errors='coerce')
     real_estate_data['price_per_month'] = pd.to_numeric(real_estate_data['price_per_month'], errors='coerce')
 
-    # Drop any rows with NaN values
+    # Entferne NaN-Werte
     real_estate_data.dropna(inplace=True)
 
-    # Selecting features and target for the model
-    X = real_estate_data[['Rooms', 'Size_m2', 'area_code']]  # Example features
-    y = real_estate_data['price_per_month']  # Target variable
+    # Modell-Training
+    X = real_estate_data[['Rooms', 'Size_m2', 'area_code']]
+    y = real_estate_data['price_per_month']
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
     model = LinearRegression()
     model.fit(X_train, y_train)
 
@@ -149,7 +140,7 @@ if st.button('Predict Rental Price'):
             similar_properties = find_similar_properties(rooms, size_m2, real_estate_data)
             if not similar_properties.empty:
                 st.write("Ähnliche Immobilien:")
-                st.dataframe(similar_properties[['Property_Type', 'Rooms', 'Size_m2', 'area_code']])
+                st.dataframe(similar_properties[['Property_Type', 'Rooms', 'Size_m2', 'area_code', 'Websiten']])
             else:
                 st.write("Keine ähnlichen Immobilien gefunden.")
 

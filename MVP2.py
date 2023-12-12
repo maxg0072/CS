@@ -17,6 +17,7 @@ body {
 
 
 
+
 # Funktion, um ähnliche Immobilien zu finden
 def find_similar_properties(input_rooms, input_size, data, threshold=10):
     similar_properties = data[

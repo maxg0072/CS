@@ -11,7 +11,7 @@ background_image_css = """
 body {
     background-image: url('https://raw.githubusercontent.com/maxg0072/CS/patch-2/pexels-mudassir-ali-3970396.jpg');
     background-size: cover;
-}
+} 
 </style>
 """
 

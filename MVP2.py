@@ -132,7 +132,7 @@ address_input = st.text_input("Enter an address or zip code in St. Gallen:")
 # Extrahieren der Postleitzahl aus der Eingabe
 extracted_zip_code = extract_zip_from_address(address_input)
 
-# Wenn eine gültige Postleitzahl extrahiert wurde, Karte und Vorhersagefunktionalität anzeigen
+# Überprüfen, ob die Eingabe eine gültige Postleitzahl aus St. Gallen ist
 if extracted_zip_code:
     # Karte anzeigen
     lat, lon = get_lat_lon_from_zip(address_input)

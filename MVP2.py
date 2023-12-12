@@ -92,20 +92,35 @@ def extract_zip_code(input_text):
 
 #NEWER VERSION PRICE PREDICT NOT MY AEREA SO NOT SURE
 def predict_price(size_m2, extracted_zip_code, rooms, model):
+    # Ensure that size_m2 and rooms are numeric and non-negative
     try:
-        area_code = int(extracted_zip_code)
-    except ValueError:
-        st.error("Bitte geben Sie eine gültige Postleitzahl ein.")
+        size_m2 = float(size_m2)
+        rooms = int(rooms)
+        if size_m2 < 0 or rooms < 0:
+            raise ValueError("Size and rooms must be non-negative.")
+    except ValueError as e:
+        st.error(f"Invalid input for size or rooms: {e}")
         return None
 
+    # Ensure that extracted_zip_code is a valid Swiss zip code (4 digits)
+    try:
+        area_code = int(extracted_zip_code)
+        if not (1000 <= area_code <= 9999):
+            raise ValueError("Invalid Swiss zip code.")
+    except ValueError as e:
+        st.error(f"Invalid zip code: {e}")
+        return None
+
+    # Create the input features DataFrame
     input_features = pd.DataFrame({
         'Rooms': [rooms],
         'Size_m2': [size_m2],
-        'area_code': [area_code]  # Verwenden Sie hier den konvertierten numerischen Wert
+        'area_code': [area_code]
     })
+
+    # Predict the price using the model
     predicted_price = model.predict(input_features)
     return predicted_price[0]
-
 
 ## Function to predict the price based on the model
 #def predict_price(size_m2, area_code, rooms, model): OLD VERSION JUST KEPT IT FOR SECURITA REASONS
@@ -175,47 +190,32 @@ tabs = st.tabs(tab_titles)
 if st.session_state.current_step == 0:
     with tabs[0]:
         address_input = st.text_input("Enter an address or zip code in St. Gallen:", key="address_input_step1")
-        st.session_state.address = address_input  # Store the address input
-        extracted_zip_code = extract_zip_from_address(address_input)
-        st.session_state.extracted_zip_code = extracted_zip_code  # Store the extracted zip code
 
-        lat, lon = get_lat_lon_from_address_or_zip(address_input) if extracted_zip_code else (default_lat, default_lon)
+        # Only perform checks if an address has been entered
+        if address_input:
+            st.session_state.address = address_input  # Store the address input
+            extracted_zip_code = extract_zip_from_address(address_input)
+            st.session_state.extracted_zip_code = extracted_zip_code  # Store the extracted zip code
 
-        if extracted_zip_code == "non-specific":
-            st.error("Please enter a more specific address or zip code in St. Gallen.")
-        elif extracted_zip_code:
-            # Display map
-            map = folium.Map(location=[lat, lon], zoom_start=16)
-            if address_input:
+            lat, lon = get_lat_lon_from_address_or_zip(address_input) if extracted_zip_code else (default_lat, default_lon)
+
+            if extracted_zip_code == "non-specific":
+                st.error("Please enter a more specific address or zip code in St. Gallen.")
+            elif extracted_zip_code:
+                # Display map
+                map = folium.Map(location=[lat, lon], zoom_start=16)
                 folium.Marker(
                     [lat, lon],
                     popup=f"Eingegebene Adresse: {address_input}",
                     icon=folium.Icon(color='red', icon="glyphicon glyphicon-menu-down")
                 ).add_to(map)
-            folium_static(map)
+                folium_static(map)
+            else:
+                st.error("Please enter a valid address or zip code in St. Gallen.")
         else:
-            st.write("Please enter a valid address or zip code in St. Gallen.")
-
-        # Extrahieren der Postleitzahl aus der Eingabe
-        extracted_zip_code = extract_zip_from_address(address_input)
-
-        # Use the function to get latitude and longitude from the input
-        lat, lon = get_lat_lon_from_address_or_zip(address_input) if extracted_zip_code else (default_lat, default_lon)
-
-        # Standardkoordinaten für St. Gallen setzen
-        default_lat, default_lon = 47.424482, 9.376717
-        lat, lon = default_lat, default_lon
-
-        # Check for the input type and update coordinates accordingly
-        if extracted_zip_code == "non-specific":
-            st.error("Please enter a more specific address or zip code in St. Gallen.")
-            lat, lon = default_lat, default_lon  # Reset to standard coordinates of St. Gallen
-        elif extracted_zip_code:
-            # Get lat, lon based on either the full address or zip code
-            lat, lon = get_lat_lon_from_address_or_zip(address_input) if address_input else (default_lat, default_lon)
-        else:
-            st.write("Please enter a valid address or zip code in St. Gallen.")
-            lat, lon = default_lat, default_lon  # Reset to standard coordinates of St. Gallen
+            # Reset to default coordinates if no address input yet
+            default_lat, default_lon = 47.424482, 9.376717
+            lat, lon = default_lat, default_lon
 
 # Step 2: Rooms
 elif st.session_state.current_step == 1:

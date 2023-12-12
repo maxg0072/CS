@@ -125,7 +125,9 @@ def main():
     }
     </style>
     """
-
+if __name__ == "__main__":
+    main()
+    
     # Streamlit UI
     st.title("Rental Price Prediction")
 
@@ -190,5 +192,3 @@ def main():
                 st.write("Unable to predict price. Please check your inputs.")
         else:
             st.write("Please enter a valid address or zip code in St. Gallen.")
-if __name__ == "__main__":
-    main()

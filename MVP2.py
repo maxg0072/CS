@@ -168,7 +168,7 @@ if 'current_step' not in st.session_state:
 num_steps = 5
 
 # Create tabs for each step
-tab_titles = ["Location", "Rooms", "Size", "Current Rent", "Result"]
+tab_titles = ["Location", "Rooms", "Size", "My Current Rent", "Results"]
 tabs = st.tabs(tab_titles)
 
 # Step 1: Location
@@ -245,6 +245,15 @@ elif st.session_state.current_step == 4:
 
         if st.button("Previous", key='prev5'):
             st.session_state.current_step -= 1
+
+# Navigation buttons
+if st.session_state.current_step > 0:
+    if st.button("Previous"):
+        st.session_state.current_step -= 1
+
+if st.session_state.current_step < num_steps - 1:
+    if st.button("Next"):
+        st.session_state.current_step += 1
 
 # Input für eine Adresse oder Postleitzahl
 address_input = st.text_input("Enter an address or zip code in St. Gallen:")

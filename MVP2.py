@@ -142,10 +142,11 @@ if st.button('Predict Rental Price'):
             if not similar_properties.empty:
                 st.markdown("### Ähnliche Immobilien:")
                 col1, col2 = st.columns(2)
-                for index, row in similar_properties.iterrows():
+
+                # Beschränke die Anzeige auf die ersten 6 Immobilien
+                for index, row in similar_properties.head(6).iterrows():
                     current_col = col1 if index % 2 == 0 else col2
                     with current_col:
-                        # Entfernen eines führenden "/" in der URL
                         website_url = row['Websiten'].lstrip('/')
                         st.markdown(
                             f"<div style='border: 1px solid grey; border-radius: 5px; padding: 10px;'>"
@@ -159,6 +160,7 @@ if st.button('Predict Rental Price'):
                         )
             else:
                 st.write("Keine ähnlichen Immobilien gefunden.")
+
 
 
 

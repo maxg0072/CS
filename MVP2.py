@@ -174,7 +174,7 @@ tabs = st.tabs(tab_titles)
 # Step 1: Location
 if st.session_state.current_step == 0:
     with tabs[0]:
-        address_input = st.text_input("Enter an address or zip code in St. Gallen:", key='address_input_step1')
+        address_input = st.text_input("Enter an address or zip code in St. Gallen:", key="address_input_step1")
         extracted_zip_code = extract_zip_from_address(address_input)
 
         lat, lon = get_lat_lon_from_address_or_zip(address_input) if extracted_zip_code else (default_lat, default_lon)
@@ -229,14 +229,17 @@ elif st.session_state.current_step == 4:
                         st.write("Unable to predict price. Please check your inputs.")
 
 
-# Navigation buttons
-if st.session_state.current_step > 0:
-    if st.button("Previous", key = "prev_button"):
-        st.session_state.current_step -= 1
+# Navigation Buttons
+col1, col2 = st.columns(2)
+with col1:
+    if st.session_state.current_step > 0:
+        if st.button("Previous", key="prev_button"):
+            st.session_state.current_step -= 1
 
-if st.session_state.current_step < num_steps - 1:
-    if st.button("Next", key = "next_button"):
-        st.session_state.current_step += 1
+with col2:
+    if st.session_state.current_step < num_steps - 1:
+        if st.button("Next", key="next_button"):
+            st.session_state.current_step += 1
 
 # Input für eine Adresse oder Postleitzahl
 address_input = st.text_input("Enter an address or zip code in St. Gallen:")

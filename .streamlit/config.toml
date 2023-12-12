@@ -1,16 +1,6 @@
-<<<<<<< HEAD
 [theme]
 primaryColor = "#8A2BE2"  # Eine lebhafte Lila Farbe für interaktive Elemente
 backgroundColor = "#FFFFFF"  # Weißer Hintergrund für den Hauptinhalt
 secondaryBackgroundColor = "#F0F0F0"  # Ein leicht grauer Hintergrund für die Sidebar
 textColor = "#333333"  # Dunkelgrauer Text für gute Lesbarkeit
 font = "serif"  # Serifenschrift für einen klassischen Look
-=======
-[theme]
-primaryColor = "#8A2BE2"  # Eine lebhafte Lila Farbe für interaktive Elemente
-backgroundColor = "#FFFFFF"  # Weißer Hintergrund für den Hauptinhalt
-secondaryBackgroundColor = "#F0F0F0"  # Ein leicht grauer Hintergrund für die Sidebar
-textColor = "#333333"  # Dunkelgrauer Text für gute Lesbarkeit
-font = "serif"  # Serifenschrift für einen klassischen Look
-
->>>>>>> f813a3a9abc03008e920980646c988ad59ce7e0d

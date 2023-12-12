@@ -106,16 +106,16 @@ def extract_zip_from_address(address):
 
     # Check if the input is too generic
     if address.lower().strip() in non_specific_inputs:
-        st.error("Please enter something a little bit more specific.")
+        st.error("Please enter a more specific address or zip code in St. Gallen.")
         return None
 
-    # If the input is already a valid zip code
-    if address.strip() in valid_st_gallen_zip_codes:
-        return address.strip()
+    # Append "St. Gallen" to the input if it's not a specific zip code
+    if address.strip() not in valid_st_gallen_zip_codes:
+        address += ", St. Gallen"
 
     # Extract zip code from a full address
     geolocator = Nominatim(user_agent="http")
-    location = geolocator.geocode(address + ", St. Gallen", country_codes='CH')
+    location = geolocator.geocode(address, country_codes='CH')
     if location:
         address_components = location.raw.get('display_name', '').split(',')
         for component in address_components:

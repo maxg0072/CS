@@ -229,8 +229,10 @@ elif st.session_state.current_step == 4:
                         st.write("Unable to predict price. Please check your inputs.")
 
 
-# Navigation Buttons
+# Placing the navigation buttons outside and below the tab system
+st.markdown("---")  # Optional line to separate the content from the buttons
 col1, col2 = st.columns(2)
+
 with col1:
     if st.session_state.current_step > 0:
         if st.button("Previous", key="prev_button"):
@@ -240,7 +242,6 @@ with col2:
     if st.session_state.current_step < num_steps - 1:
         if st.button("Next", key="next_button"):
             st.session_state.current_step += 1
-
 # Input für eine Adresse oder Postleitzahl
 address_input = st.text_input("Enter an address or zip code in St. Gallen:")
 

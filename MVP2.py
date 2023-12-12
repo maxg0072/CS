@@ -102,18 +102,15 @@ def predict_price(size_m2, extracted_zip_code, rooms, model):
 
 def extract_zip_from_address(address):
     valid_st_gallen_zip_codes = ['9000', '9001', '9004', '9006', '9007', '9008', '9010', '9011', '9012', '9013', '9014', '9015', '9016', '9020', '9021', '9023', '9024', '9026', '9027', '9028', '9029']
-    non_specific_inputs = ['st. gallen', 'st gallen', 'sankt gallen']
 
-    # Check if the input is too generic
-    if address.lower().strip() in non_specific_inputs:
-        st.error("Please enter a more specific address or zip code in St. Gallen.")
-        return None
+    # If the input is a specific zip code, use it as is
+    if address.strip() in valid_st_gallen_zip_codes:
+        return address.strip()
 
-    # Append "St. Gallen" to the input if it's not a specific zip code
-    if address.strip() not in valid_st_gallen_zip_codes:
-        address += ", St. Gallen"
+    # Otherwise, append ", St. Gallen" to localize the search
+    address += ", St. Gallen"
 
-    # Extract zip code from a full address
+    # Extract zip code from the full address
     geolocator = Nominatim(user_agent="http")
     location = geolocator.geocode(address, country_codes='CH')
     if location:

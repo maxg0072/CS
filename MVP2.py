@@ -10,6 +10,24 @@ from geopy.geocoders import Nominatim
 # Standard coordinates for St. Gallen
 default_lat, default_lon = 47.424482, 9.376717
 
+# Initialize session state variables
+if 'current_step' not in st.session_state:
+    st.session_state.current_step = 0
+if 'address' not in st.session_state:
+    st.session_state.address = ""
+# Add other necessary session states
+
+# Define functions to handle navigation
+def go_to_next_step():
+    st.session_state.current_step += 1
+
+def go_to_previous_step():
+    st.session_state.current_step -= 1
+
+# Create tabs for each step
+tab_titles = ["Location", "Rooms", "Size", "Current Rent", "Result"]
+tabs = st.tabs(tab_titles)
+
 # Backend Code: Data Preprocessing and Model Training
 def preprocess_and_train():
     # Load the dataset (replace with your actual file path)

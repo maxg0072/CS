@@ -141,7 +141,7 @@ if st.button('Predict Rental Price'):
             similar_properties = find_similar_properties(rooms, size_m2, real_estate_data)
             if not similar_properties.empty:
                 st.markdown("### Ähnliche Immobilien:")
-                col1, col2 = st.columns(2)
+                col1, col2 = st.columns(2) 
                 for index, row in enumerate(similar_properties.iterrows()):
                     current_col = col1 if index % 2 == 0 else col2
                     with current_col:

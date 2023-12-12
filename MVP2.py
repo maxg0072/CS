@@ -6,8 +6,6 @@ import folium
 from streamlit_folium import folium_static
 from geopy.geocoders import Nominatim
 
-
-
 # Benutzerdefinierter HTML- und CSS-Code für den Fade-In-Effekt
 fade_in_css = """
 <style>
@@ -29,16 +27,24 @@ fade_in_css = """
 </style>
 """
 
-# Streamlit-Seite mit benutzerdefiniertem Fade-In-Effekt
-def main():
-    st.markdown(fade_in_css, unsafe_allow_html=True)
+st.markdown(fade_in_css, unsafe_allow_html=True)
 
-    # Hier wird der Fade-In-Effekt angewendet
-    st.markdown('<h1 class="fade-in">Willkommen auf meiner Seite</h1>', unsafe_allow_html=True)
-    st.markdown('<p class="fade-in">Dies ist ein Beispiel für einen Fade-In-Effekt.</p>', unsafe_allow_html=True)
+# Der Rest Ihres Codes ...
+# (Hier folgen die Funktionen `find_similar_properties`, `preprocess_and_train` etc.)
+
+# Streamlit UI
+def main():
+    # Hier beginnt Ihr Haupt-Streamlit-Code
+    st.markdown('<h1 class="fade-in">Rental Price Prediction</h1>', unsafe_allow_html=True)
+
+    # Eingabe für Adresse oder Postleitzahl
+    address_input = st.text_input("Enter an address or zip code in St. Gallen:")
+
+    # ... (Der restliche Teil Ihrer Streamlit-Anwendung)
 
 if __name__ == "__main__":
     main()
+
 
 
 # Funktion, um ähnliche Immobilien zu finden

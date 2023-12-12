@@ -168,7 +168,7 @@ if address_input:
     folium.Marker(
         [lat, lon],
         popup=f"Eingegebene Adresse: {address_input}",
-        icon=folium.Icon(color='green')  # Sie können die Farbe ändern
+        icon=folium.Icon(color='red')  # Sie können die Farbe ändern
     ).add_to(map)
 
 folium_static(map)

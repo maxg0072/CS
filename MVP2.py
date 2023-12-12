@@ -140,17 +140,20 @@ if st.button('Predict Rental Price'):
             similar_properties = find_similar_properties(rooms, size_m2, real_estate_data)
             if not similar_properties.empty:
                 st.markdown("### Ähnliche Immobilien:")
-                # Erstellen von zwei Spalten für die Anzeige der Immobilien
                 col1, col2 = st.columns(2)
                 for index, row in enumerate(similar_properties.iterrows()):
                     current_col = col1 if index % 2 == 0 else col2
                     with current_col:
+                        # Definieren des HTML- und CSS-Codes für den Rahmen
                         st.markdown(
-                            f"* **Typ:** {row[1]['Property_Type']} \n"
-                            f"  * **Größe:** {row[1]['Size_m2']} Quadratmeter \n"
-                            f"  * **Preis:** CHF {row[1]['price_per_month']} pro Monat \n"
-                            f"  * **Ort:** {row[1]['area_code']} \n"
-                            f"  * **Website:** [Link]({row[1]['Websiten']})"
+                            f"<div style='border: 1px solid grey; border-radius: 5px; padding: 10px;'>"
+                            f"<b>Typ:</b> {row[1]['Property_Type']} <br>"
+                            f"<b>Größe:</b> {row[1]['Size_m2']} Quadratmeter <br>"
+                            f"<b>Preis:</b> CHF {row[1]['price_per_month']} pro Monat <br>"
+                            f"<b>Ort:</b> {row[1]['area_code']} <br>"
+                            f"<b>Website:</b> <a href='{row[1]['Websiten']}' target='_blank'>Link</a>"
+                            f"</div>",
+                            unsafe_allow_html=True
                         )
             else:
                 st.write("Keine ähnlichen Immobilien gefunden.")

@@ -137,27 +137,29 @@ if st.button('Predict Rental Price'):
         if predicted_price is not None:
             st.write(f"The predicted price for the apartment is CHF {predicted_price:.2f}")
 
-            # Ähnliche Immobilien finden und anzeigen 
+            # Ähnliche Immobilien finden und anzeigen
             similar_properties = find_similar_properties(rooms, size_m2, real_estate_data)
             if not similar_properties.empty:
                 st.markdown("### Ähnliche Immobilien:")
-                col1, col2 = st.columns(2) 
-                for index, row in enumerate(similar_properties.iterrows()):
+                col1, col2 = st.columns(2)
+                for index, row in similar_properties.iterrows():
                     current_col = col1 if index % 2 == 0 else col2
                     with current_col:
-                        # Definieren des HTML- und CSS-Codes für den Rahmen
+                        # Entfernen eines führenden "/" in der URL
+                        website_url = row['Websiten'].lstrip('/')
                         st.markdown(
                             f"<div style='border: 1px solid grey; border-radius: 5px; padding: 10px;'>"
-                            f"<b>Typ:</b> {row[1]['Property_Type']} <br>"
-                            f"<b>Größe:</b> {row[1]['Size_m2']} Quadratmeter <br>"
-                            f"<b>Preis:</b> CHF {row[1]['price_per_month']} pro Monat <br>"
-                            f"<b>Ort:</b> {row[1]['area_code']} <br>"
-                            f"<b>Website:</b> <a href='{row[1]['Websiten']}' target='_blank'>Link</a>"
+                            f"<b>Typ:</b> {row['Property_Type']} <br>"
+                            f"<b>Größe:</b> {row['Size_m2']} Quadratmeter <br>"
+                            f"<b>Preis:</b> CHF {row['price_per_month']} pro Monat <br>"
+                            f"<b>Ort:</b> {row['area_code']} <br>"
+                            f"<b>Website:</b> <a href='http://{website_url}' target='_blank'>Link</a>"
                             f"</div>",
                             unsafe_allow_html=True
                         )
             else:
                 st.write("Keine ähnlichen Immobilien gefunden.")
+
 
 
         else:

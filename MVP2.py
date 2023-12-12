@@ -117,6 +117,14 @@ def get_lat_lon_from_zip(address):
 def main():
     # Setzen des Hintergrundbildes
     st.markdown(background_image_css, unsafe_allow_html=True)
+    background_image_css = """
+    <style>
+    body {
+        background-image: url('https://raw.githubusercontent.com/maxg0072/CS/patch-2/pexels-mudassir-ali-3970396.jpg');
+        background-size: cover;
+    }
+    </style>
+    """
 
     # Streamlit UI
     st.title("Rental Price Prediction")

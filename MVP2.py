@@ -120,10 +120,11 @@ def extract_zip_from_address(address):
                 return component.strip()
     return None
 
-# Function to get latitude and longitude from zip code
 def get_lat_lon_from_zip(address):
+    # Append "St. Gallen" to the address to localize the search
+    localized_address = address + ", St. Gallen, Switzerland"
     geolocator = Nominatim(user_agent="http")
-    location = geolocator.geocode(address)
+    location = geolocator.geocode(localized_address)
     if location:
         return location.latitude, location.longitude
     else:
@@ -143,8 +144,8 @@ extracted_zip_code = extract_zip_from_address(address_input)
 
 # Überprüfen, ob die Eingabe eine gültige Postleitzahl aus St. Gallen ist
 if extracted_zip_code:
-    # Karte anzeigen
-    lat, lon = get_lat_lon_from_zip(extracted_zip_code) # Use extracted_zip_code here
+    # Use extracted_zip_code for map display
+    lat, lon = get_lat_lon_from_zip(extracted_zip_code)
     if lat and lon:
         map = folium.Map(location=[lat, lon], zoom_start=16)
         folium.Marker([lat, lon]).add_to(map)

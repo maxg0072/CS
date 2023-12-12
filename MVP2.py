@@ -6,16 +6,37 @@ import folium
 from streamlit_folium import folium_static
 from geopy.geocoders import Nominatim
 
-background_image_css = """
-<style>
-body {
-    background-image: url('https://raw.githubusercontent.com/maxg0072/CS/patch-2/pexels-mudassir-ali-3970396.jpg');
-    background-size: cover;
-}
-</style>
-"""
 
 
+# Benutzerdefinierter HTML- und CSS-Code für den Fade-In-Effekt
+
+
+# Streamlit-Seite mit benutzerdefiniertem Fade-In-Effekt
+def main():
+    st.markdown(fade_in_css, unsafe_allow_html=True)
+
+    fade_in_css = """
+    <style>
+    .fade-in {
+        opacity: 0;
+        animation: fadeInAnimation ease 3s;
+        animation-iteration-count: 1;
+        animation-fill-mode: forwards;
+    }
+
+    @keyframes fadeInAnimation {
+        0% {
+            opacity: 0;
+        }
+        100% {
+            opacity: 1;
+        }
+    }
+    </style>
+    """
+
+    if __name__ == "__main__":
+        main()
 
 
 # Funktion, um ähnliche Immobilien zu finden
@@ -114,81 +135,65 @@ def get_lat_lon_from_zip(address):
         return None, None
 
 
-def main():
-    # Setzen des Hintergrundbildes
-    st.markdown(background_image_css, unsafe_allow_html=True)
-    background_image_css = """
-    <style>
-    body {
-        background-image: url('https://raw.githubusercontent.com/maxg0072/CS/patch-2/pexels-mudassir-ali-3970396.jpg');
-        background-size: cover;
-    }
-    </style>
-    """
-if __name__ == "__main__":
-    main()
-    
-    # Streamlit UI
-    st.title("Rental Price Prediction")
+# Streamlit UI
+st.title("Rental Price Prediction")
 
-    # Streamlit UI
-    st.title("Rental Price Prediction")
+# Modell und Daten laden
+model, real_estate_data = preprocess_and_train()
 
-    # Modell und Daten laden
-    model, real_estate_data = preprocess_and_train()
+# Input für Adresse oder Postleitzahl
+address_input = st.text_input("Enter an address or zip code in St. Gallen:")
 
-    # Input für Adresse oder Postleitzahl
-    address_input = st.text_input("Enter an address or zip code in St. Gallen:")
+# Extrahieren der Postleitzahl aus der Eingabe
+extracted_zip_code = extract_zip_from_address(address_input)
 
-    # Extrahieren der Postleitzahl aus der Eingabe
-    extracted_zip_code = extract_zip_from_address(address_input)
-
-    # Display the map based on the address or zip code
-    if address_input:
-        lat, lon = get_lat_lon_from_zip(address_input)
-        if lat and lon:
-            map = folium.Map(location=[lat, lon], zoom_start=16)
-            folium.Marker([lat, lon]).add_to(map)
-            folium_static(map)
-        else:
-            st.write("Invalid zip code or location not found.")
+# Display the map based on the address or zip code
+if address_input:
+    lat, lon = get_lat_lon_from_zip(address_input)
+    if lat and lon:
+        map = folium.Map(location=[lat, lon], zoom_start=16)
+        folium.Marker([lat, lon]).add_to(map)
+        folium_static(map)
+    else:
+        st.write("Invalid zip code or location not found.")
 
 
-    # Input für die Anzahl der Zimmer und Größe in Quadratmetern
-    rooms = st.number_input("Enter the number of rooms", min_value=1, max_value=10)
-    size_m2 = st.number_input("Enter the size in square meters", min_value=0)
+# Input für die Anzahl der Zimmer und Größe in Quadratmetern
+rooms = st.number_input("Enter the number of rooms", min_value=1, max_value=10)
+size_m2 = st.number_input("Enter the size in square meters", min_value=0)
 
-    # Predict Rental Price button and functionality
-    if st.button('Predict Rental Price'):
-        if extracted_zip_code:
-            predicted_price = predict_price(size_m2, extracted_zip_code, rooms, model)
-            if predicted_price is not None:
-                st.write(f"The predicted price for the apartment is CHF {predicted_price:.2f}")
+# Predict Rental Price button and functionality
+if st.button('Predict Rental Price'):
+    if extracted_zip_code:
+        predicted_price = predict_price(size_m2, extracted_zip_code, rooms, model)
+        if predicted_price is not None:
+            st.write(f"The predicted price for the apartment is CHF {predicted_price:.2f}")
 
-                # Ähnliche Immobilien finden und anzeigen
-                similar_properties = find_similar_properties(rooms, size_m2, real_estate_data)
-                if not similar_properties.empty:
-                    st.markdown("### Ähnliche Immobilien:")
-                    col1, col2 = st.columns(2)
-                    for index, row in enumerate(similar_properties.iterrows()):
-                        current_col = col1 if index % 2 == 0 else col2
-                        with current_col:
-                            # Definieren des HTML- und CSS-Codes für den Rahmen
-                            st.markdown(
-                                f"<div style='border: 1px solid grey; border-radius: 5px; padding: 10px;'>"
-                                f"<b>Typ:</b> {row[1]['Property_Type']} <br>"
-                                f"<b>Größe:</b> {row[1]['Size_m2']} Quadratmeter <br>"
-                                f"<b>Preis:</b> CHF {row[1]['price_per_month']} pro Monat <br>"
-                                f"<b>Ort:</b> {row[1]['area_code']} <br>"
-                                f"<b>Website:</b> <a href='{row[1]['Websiten']}' target='_blank'>Link</a>"
-                                f"</div>",
-                                unsafe_allow_html=True
-                            )
-                else:
-                    st.write("Keine ähnlichen Immobilien gefunden.")
-
-
+            # Ähnliche Immobilien finden und anzeigen
+            similar_properties = find_similar_properties(rooms, size_m2, real_estate_data)
+            if not similar_properties.empty:
+                st.markdown("### Ähnliche Immobilien:")
+                col1, col2 = st.columns(2)
+                for index, row in enumerate(similar_properties.iterrows()):
+                    current_col = col1 if index % 2 == 0 else col2
+                    with current_col:
+                        # Definieren des HTML- und CSS-Codes für den Rahmen
+                        st.markdown(
+                            f"<div style='border: 1px solid grey; border-radius: 5px; padding: 10px;'>"
+                            f"<b>Typ:</b> {row[1]['Property_Type']} <br>"
+                            f"<b>Größe:</b> {row[1]['Size_m2']} Quadratmeter <br>"
+                            f"<b>Preis:</b> CHF {row[1]['price_per_month']} pro Monat <br>"
+                            f"<b>Ort:</b> {row[1]['area_code']} <br>"
+                            f"<b>Website:</b> <a href='{row[1]['Websiten']}' target='_blank'>Link</a>"
+                            f"</div>",
+                            unsafe_allow_html=True
+                        )
             else:
-                st.write("Unable to predict price. Please check your inputs.")
+                st.write("Keine ähnlichen Immobilien gefunden.")
+
+
         else:
-            st.write("Please enter a valid address or zip code in St. Gallen.")
+            st.write("Unable to predict price. Please check your inputs.")
+    else:
+        st.write("Please enter a valid address or zip code in St. Gallen.")
+

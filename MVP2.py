@@ -6,6 +6,23 @@ import folium
 from streamlit_folium import folium_static
 from geopy.geocoders import Nominatim
 
+background_image_css = """
+<style>
+body {
+    background-image: url('https://raw.githubusercontent.com/maxg0072/CS/patch-2/pexels-mudassir-ali-3970396.jpg');
+    background-size: cover;
+}
+</style>
+"""
+
+def main():
+    st.markdown(background_image_css, unsafe_allow_html=True)
+    st.title("Rental Price Prediction")
+    # Ihr übriger Code...
+
+if __name__ == "__main__":
+    main()
+    
 # Funktion, um ähnliche Immobilien zu finden
 def find_similar_properties(input_rooms, input_size, data, threshold=10):
     similar_properties = data[

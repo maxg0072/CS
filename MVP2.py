@@ -9,11 +9,12 @@ from geopy.geocoders import Nominatim
 background_image_css = """
 <style>
 body {
-    background-image: url('pexels-mudassir-ali-3970396.jpg');
+    background-image: url('https://raw.githubusercontent.com/maxg0072/CS/patch-2/pexels-mudassir-ali-3970396.jpg');
     background-size: cover;
 }
 </style>
 """
+
 
 
 # Funktion, um ähnliche Immobilien zu finden

@@ -129,16 +129,13 @@ def extract_zip_from_address(address):
                 return component.strip()
     return None
 
-def get_lat_lon_from_input(input_text):
+def get_lat_lon_from_address_or_zip(input_text):
     geolocator = Nominatim(user_agent="http")
-
-    # Localize the search to St. Gallen if it's a zip code
+    # Add 'St. Gallen' suffix for zip codes to narrow down the search
     if input_text.isdigit() and len(input_text) == 4:
-        search_query = f"{input_text}, St. Gallen, Switzerland"
-    else:
-        search_query = input_text + ", St. Gallen, Switzerland"
+        input_text += ", St. Gallen, Switzerland"
 
-    location = geolocator.geocode(search_query)
+    location = geolocator.geocode(input_text)
     if location:
         return location.latitude, location.longitude
     else:
@@ -147,7 +144,7 @@ def get_lat_lon_from_input(input_text):
 # Preprocess data and train the model
 model = preprocess_and_train()
 
-######### Streamlit UI ##########
+# Streamlit UI
 st.title("Rental Price Prediction")
 
 # Input für eine Adresse oder Postleitzahl
@@ -157,7 +154,7 @@ address_input = st.text_input("Enter an address or zip code in St. Gallen:")
 extracted_zip_code = extract_zip_from_address(address_input)
 
 # Use the function to get latitude and longitude from the input
-lat, lon = get_lat_lon_from_input(address_input) if extracted_zip_code else (default_lat, default_lon)
+lat, lon = get_lat_lon_from_address_or_zip(address_input) if extracted_zip_code else (default_lat, default_lon)
 
 # Standardkoordinaten für St. Gallen setzen
 default_lat, default_lon = 47.424482, 9.376717
@@ -166,12 +163,13 @@ lat, lon = default_lat, default_lon
 # Check for the input type and update coordinates accordingly
 if extracted_zip_code == "non-specific":
     st.error("Please enter a more specific address or zip code in St. Gallen.")
-    lat, lon = default_lat, default_lon
+    lat, lon = default_lat, default_lon  # Reset to standard coordinates of St. Gallen
 elif extracted_zip_code:
-    lat, lon = get_lat_lon_from_input(extracted_zip_code)
+    # Get lat, lon based on either the full address or zip code
+    lat, lon = get_lat_lon_from_address_or_zip(address_input) if address_input else (default_lat, default_lon)
 else:
     st.write("Please enter a valid address or zip code in St. Gallen.")
-    lat, lon = default_lat, default_lon
+    lat, lon = default_lat, default_lon  # Reset to standard coordinates of St. Gallen
 
 # Karte anzeigen
 map = folium.Map(location=[lat, lon], zoom_start=16)
@@ -187,7 +185,7 @@ if address_input and extracted_zip_code:
 folium_static(map)
 
 # Vorhersagefunktionalität nur aktiviert, wenn eine gültige Postleitzahl vorliegt
-if extracted_zip_code and extracted_zip_code != "non-specific":
+if extracted_zip_code and not extracted_zip_code == "non-specific":
     room_options = list(range(1, 7))  # Liste von 1 bis 6
     rooms = st.selectbox("Select the number of rooms", room_options)
     size_m2 = st.number_input("Enter the size in square meters", min_value=0)

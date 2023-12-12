@@ -7,38 +7,6 @@ from streamlit_folium import folium_static
 from geopy.geocoders import Nominatim
 
 
-
-# Benutzerdefinierter HTML- und CSS-Code für den Fade-In-Effekt
-
-
-# Streamlit-Seite mit benutzerdefiniertem Fade-In-Effekt
-def main():
-    st.markdown(fade_in_css, unsafe_allow_html=True)
-
-    fade_in_css = """
-    <style>
-    .fade-in {
-        opacity: 0;
-        animation: fadeInAnimation ease 3s;
-        animation-iteration-count: 1;
-        animation-fill-mode: forwards;
-    }
-
-    @keyframes fadeInAnimation {
-        0% {
-            opacity: 0;
-        }
-        100% {
-            opacity: 1;
-        }
-    }
-    </style>
-    """
-
-    if __name__ == "__main__":
-        main()
-
-
 # Funktion, um ähnliche Immobilien zu finden
 def find_similar_properties(input_rooms, input_size, data, threshold=10):
     similar_properties = data[

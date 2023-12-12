@@ -175,7 +175,9 @@ tabs = st.tabs(tab_titles)
 if st.session_state.current_step == 0:
     with tabs[0]:
         address_input = st.text_input("Enter an address or zip code in St. Gallen:", key="address_input_step1")
+        st.session_state.address = address_input  # Store the address input
         extracted_zip_code = extract_zip_from_address(address_input)
+        st.session_state.extracted_zip_code = extracted_zip_code  # Store the extracted zip code
 
         lat, lon = get_lat_lon_from_address_or_zip(address_input) if extracted_zip_code else (default_lat, default_lon)
 
@@ -218,12 +220,12 @@ if st.session_state.current_step == 0:
 # Step 2: Rooms
 elif st.session_state.current_step == 1:
     with tabs[1]:
-        rooms = st.selectbox("Select the number of rooms", range(1, 7), key='rooms_step2')
+        st.session_state.rooms = st.selectbox("Select the number of rooms", range(1, 7), key='rooms_step2')
 
 # Step 3: Size
 elif st.session_state.current_step == 2:
     with tabs[2]:
-        size_m2 = st.number_input("Enter the size in square meters", min_value=0, key='size_m2_step3')
+        st.session_state.size_m2 = st.number_input("Enter the size in square meters", min_value=0, key='size_m2_step3')
 
 # Step 4: Current Rent
 elif st.session_state.current_step == 3:
@@ -233,13 +235,10 @@ elif st.session_state.current_step == 3:
 # Step 5: Result
 elif st.session_state.current_step == 4:
     with tabs[4]:
-        if 'address' in st.session_state and 'rooms' in st.session_state and 'size_m2' in st.session_state:
-            extracted_zip_code = extract_zip_code(st.session_state.address)
-            rooms = st.session_state.rooms
-            size_m2 = st.session_state.size_m2
-
+        if 'extracted_zip_code' in st.session_state and 'rooms' in st.session_state and 'size_m2' in st.session_state:
+            # Use st.session_state variables for prediction
             if st.button('Predict Rental Price', key='predict_button'):
-                predicted_price = predict_price(size_m2, extracted_zip_code, rooms, model)
+                predicted_price = predict_price(st.session_state.size_m2, st.session_state.extracted_zip_code, st.session_state.rooms, model)
                 if predicted_price is not None:
                     st.write(f"The predicted price for the apartment is CHF {predicted_price:.2f}")
                 else:

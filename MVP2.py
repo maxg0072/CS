@@ -74,6 +74,7 @@ def extract_zip_code(input_text):
             return part
     return None  # Keine gültige Postleitzahl gefunden
 
+#NEWER VERSION PRICE PREDICT NOT MY AEREA SO NOT SURE
 def predict_price(size_m2, extracted_zip_code, rooms, model):
     try:
         area_code = int(extracted_zip_code)
@@ -91,7 +92,7 @@ def predict_price(size_m2, extracted_zip_code, rooms, model):
 
 
 ## Function to predict the price based on the model
-#def predict_price(size_m2, area_code, rooms, model):
+#def predict_price(size_m2, area_code, rooms, model): OLD VERSION JUST KEPT IT FOR SECURITA REASONS
     input_features = pd.DataFrame({
         'Rooms': [rooms],
         'Size_m2': [size_m2],
@@ -147,16 +148,17 @@ address_input = st.text_input("Enter an address or zip code in St. Gallen:")
 # Extrahieren der Postleitzahl aus der Eingabe
 extracted_zip_code = extract_zip_from_address(address_input)
 
-# Standardposition für die Karte setzen (St. Gallen, 9000)
-default_lat, default_lon = 47.424482, 9.376717  # Koordinaten von St. Gallen
-lat, lon = default_lat, default_lon
-
 # Überprüfen, ob die Eingabe eine gültige Postleitzahl aus St. Gallen ist
 if extracted_zip_code == "non-specific":
     st.error("Please enter a more specific address or zip code in St. Gallen.")
+    lat, lon = 47.424482, 9.376717  # Standard-Koordinaten von St. Gallen
 elif extracted_zip_code:
     # Aktualisiere die Koordinaten für die Kartenanzeige
     lat, lon = get_lat_lon_from_zip(extracted_zip_code)
+else:
+    # Keine Eingabe oder ungültige Eingabe
+    st.write("Please enter a valid address or zip code in St. Gallen.")
+    lat, lon = 47.424482, 9.376717  # Standard-Koordinaten von St. Gallen
 
 # Karte anzeigen
 map = folium.Map(location=[lat, lon], zoom_start=16)

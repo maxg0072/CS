@@ -179,7 +179,7 @@ if address_input and extracted_zip_code:
     folium.Marker(
         [lat, lon],
         popup=f"Eingegebene Adresse: {address_input}",
-        icon=folium.Icon(color='red')
+        icon=folium.Icon(color='red', icon="glyphicon glyphicon-menu-down")
     ).add_to(map)
 
 folium_static(map)

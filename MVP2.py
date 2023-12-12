@@ -7,7 +7,7 @@ from streamlit_folium import folium_static
 from geopy.geocoders import Nominatim
 
 
-# Funktion, um ähnliche Immobilien zu finden
+# Funktion, um ähnliche Immobilien zu finden 
 def find_similar_properties(input_rooms, input_size, data, threshold=10):
     similar_properties = data[
         (data['Rooms'].between(input_rooms - 1, input_rooms + 1)) &

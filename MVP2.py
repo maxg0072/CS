@@ -146,12 +146,13 @@ if st.button('Predict Rental Price'):
             st.write(f"The predicted price for the apartment is CHF {predicted_price:.2f}")
 
             # Ähnliche Immobilien finden und anzeigen
-            similar_properties = find_similar_properties(extracted_zip_code, rooms, size_m2, real_estate_data)
+            similar_properties = find_similar_properties(rooms, size_m2, real_estate_data)
             if not similar_properties.empty:
                 st.write("Ähnliche Immobilien:")
                 st.dataframe(similar_properties[['Property_Type', 'Rooms', 'Size_m2', 'area_code']])
             else:
                 st.write("Keine ähnlichen Immobilien gefunden.")
+
         else:
             st.write("Unable to predict price. Please check your inputs.")
     else:

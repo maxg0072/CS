@@ -107,8 +107,13 @@ def extract_zip_from_address(address):
     if address.strip() in valid_st_gallen_zip_codes:
         return address.strip()
 
+    # Handle unspecific inputs like "St. Gallen"
+    if address.strip().lower() == 'st. gallen':
+        address = 'St. Gallen, Switzerland'
+
     # Otherwise, append ", St. Gallen" to localize the search
-    address += ", St. Gallen"
+    else:
+        address += ", St. Gallen, Switzerland"
 
     # Extract zip code from the full address
     geolocator = Nominatim(user_agent="http")
@@ -145,7 +150,7 @@ extracted_zip_code = extract_zip_from_address(address_input)
 # Überprüfen, ob die Eingabe eine gültige Postleitzahl aus St. Gallen ist
 if extracted_zip_code:
     # Use extracted_zip_code for map display
-    lat, lon = get_lat_lon_from_zip(extracted_zip_code)
+    lat, lon = get_lat_lon_from_zip(address_input)
     if lat and lon:
         map = folium.Map(location=[lat, lon], zoom_start=16)
         folium.Marker([lat, lon]).add_to(map)

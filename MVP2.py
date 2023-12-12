@@ -148,27 +148,28 @@ address_input = st.text_input("Enter an address or zip code in St. Gallen:")
 # Extrahieren der Postleitzahl aus der Eingabe
 extracted_zip_code = extract_zip_from_address(address_input)
 
+# Standardkoordinaten für St. Gallen setzen
+default_lat, default_lon = 47.424482, 9.376717
+lat, lon = default_lat, default_lon
+
 # Überprüfen, ob die Eingabe eine gültige Postleitzahl aus St. Gallen ist
 if extracted_zip_code == "non-specific":
     st.error("Please enter a more specific address or zip code in St. Gallen.")
-    lat, lon = 47.424482, 9.376717  # Standard-Koordinaten von St. Gallen
 elif extracted_zip_code:
-    # Aktualisiere die Koordinaten für die Kartenanzeige basierend auf der extrahierten Postleitzahl
-    lat, lon = get_lat_lon_from_zip(address_input)
+    # Koordinaten basierend auf der extrahierten Postleitzahl aktualisieren
+    lat, lon = get_lat_lon_from_zip(extracted_zip_code)
 else:
-    # Keine Eingabe oder ungültige Eingabe
     st.write("Please enter a valid address or zip code in St. Gallen.")
-    lat, lon = 47.424482, 9.376717  # Standard-Koordinaten von St. Gallen
 
 # Karte anzeigen
 map = folium.Map(location=[lat, lon], zoom_start=16)
 
-# Marker mit benutzerdefinierter Farbe und Popup hinzufügen
-if address_input:
+# Marker hinzufügen, wenn eine gültige Adresse oder Postleitzahl eingegeben wurde
+if address_input and extracted_zip_code:
     folium.Marker(
         [lat, lon],
         popup=f"Eingegebene Adresse: {address_input}",
-        icon=folium.Icon(color='red')  # Sie können die Farbe ändern
+        icon=folium.Icon(color='red')
     ).add_to(map)
 
 folium_static(map)

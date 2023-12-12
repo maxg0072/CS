@@ -102,18 +102,18 @@ def predict_price(size_m2, extracted_zip_code, rooms, model):
 
 def extract_zip_from_address(address):
     valid_st_gallen_zip_codes = ['9000', '9001', '9004', '9006', '9007', '9008', '9010', '9011', '9012', '9013', '9014', '9015', '9016', '9020', '9021', '9023', '9024', '9026', '9027', '9028', '9029']
+    non_specific_inputs = ['st. gallen', 'st gallen', 'sankt gallen']
+
+    # Check for non-specific input
+    if address.lower().strip() in non_specific_inputs:
+        return "non-specific"
 
     # If the input is a specific zip code, use it as is
     if address.strip() in valid_st_gallen_zip_codes:
         return address.strip()
 
-    # Handle unspecific inputs like "St. Gallen"
-    if address.strip().lower() == 'st. gallen':
-        address = 'St. Gallen, Switzerland'
-
     # Otherwise, append ", St. Gallen" to localize the search
-    else:
-        address += ", St. Gallen, Switzerland"
+    address += ", St. Gallen"
 
     # Extract zip code from the full address
     geolocator = Nominatim(user_agent="http")
@@ -147,21 +147,25 @@ address_input = st.text_input("Enter an address or zip code in St. Gallen:")
 # Extrahieren der Postleitzahl aus der Eingabe
 extracted_zip_code = extract_zip_from_address(address_input)
 
+# Streamlit UI
+
+# ... [Vorheriger Code]
+
 # Überprüfen, ob die Eingabe eine gültige Postleitzahl aus St. Gallen ist
-if extracted_zip_code:
-    # Use extracted_zip_code for map display
-    lat, lon = get_lat_lon_from_zip(address_input)
+if extracted_zip_code == "non-specific":
+    st.error("Please enter a more specific address or zip code in St. Gallen.")
+elif extracted_zip_code:
+    # Karte anzeigen und Vorhersagefunktionalität
+    lat, lon = get_lat_lon_from_zip(extracted_zip_code)  # Verwenden Sie hier extracted_zip_code
     if lat and lon:
         map = folium.Map(location=[lat, lon], zoom_start=16)
         folium.Marker([lat, lon]).add_to(map)
         folium_static(map)
-
-        # Dropdown für Zimmer und Eingabe für Quadratmeter
-        room_options = list(range(1, 7,))  # Liste von 1 bis 6
+        
+        room_options = list(range(1, 7))  # Liste von 1 bis 6
         rooms = st.selectbox("Select the number of rooms", room_options)
         size_m2 = st.number_input("Enter the size in square meters", min_value=0)
 
-        # Vorhersagefunktionalität
         if st.button('Predict Rental Price'):
             predicted_price = predict_price(size_m2, extracted_zip_code, rooms, model)
             if predicted_price is not None:

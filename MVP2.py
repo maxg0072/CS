@@ -15,12 +15,6 @@ body {
 </style>
 """
 
-def main():
-    st.markdown(background_image_css, unsafe_allow_html=True)
-    st.title("Rental Price Prediction")
-    # Ihr übriger Code...
-
-
 # Funktion, um ähnliche Immobilien zu finden
 def find_similar_properties(input_rooms, input_size, data, threshold=10):
     similar_properties = data[
@@ -117,6 +111,13 @@ def get_lat_lon_from_zip(address):
         return None, None
 
 
+def main():
+    # Setzen des Hintergrundbildes
+    st.markdown(background_image_css, unsafe_allow_html=True)
+    st.title("Rental Price Prediction")
+    # Weitere Inhalte Ihrer Streamlit-Anwendung
+    # ...
+
 # Streamlit UI
 st.title("Rental Price Prediction")
 
@@ -178,7 +179,5 @@ if st.button('Predict Rental Price'):
             st.write("Unable to predict price. Please check your inputs.")
     else:
         st.write("Please enter a valid address or zip code in St. Gallen.")
-
-        
 if __name__ == "__main__":
     main()

@@ -246,10 +246,6 @@ elif st.session_state.current_step == 4:
         if st.button("Previous", key='prev5'):
             st.session_state.current_step -= 1
 
-# Make tabs visible based on the current step
-for i in range(len(tab_titles)):
-    tabs[i].empty() if i != st.session_state.current_step else None
-
 # Input für eine Adresse oder Postleitzahl
 address_input = st.text_input("Enter an address or zip code in St. Gallen:")
 

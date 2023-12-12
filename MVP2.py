@@ -144,26 +144,26 @@ extracted_zip_code = extract_zip_from_address(address_input)
 # Überprüfen, ob die Eingabe eine gültige Postleitzahl aus St. Gallen ist
 if extracted_zip_code:
     # Karte anzeigen
-    lat, lon = get_lat_lon_from_zip(address_input)
+    lat, lon = get_lat_lon_from_zip(extracted_zip_code) # Use extracted_zip_code here
     if lat and lon:
         map = folium.Map(location=[lat, lon], zoom_start=16)
         folium.Marker([lat, lon]).add_to(map)
         folium_static(map)
+
+        # Dropdown für Zimmer und Eingabe für Quadratmeter
+        room_options = list(range(1, 7))  # Liste von 1 bis 6
+        rooms = st.selectbox("Select the number of rooms", room_options)
+        size_m2 = st.number_input("Enter the size in square meters", min_value=0)
+
+        # Vorhersagefunktionalität
+        if st.button('Predict Rental Price'):
+            predicted_price = predict_price(size_m2, extracted_zip_code, rooms, model)
+            if predicted_price is not None:
+                st.write(f"The predicted price for the apartment is CHF {predicted_price:.2f}")
+            else:
+                st.write("Unable to predict price. Please check your inputs.")
     else:
         st.write("Invalid zip code or location not found.")
-
-    # Dropdown für Zimmer und Eingabe für Quadratmeter
-    room_options = list(range(1, 7))  # Liste von 1 bis 6
-    rooms = st.selectbox("Select the number of rooms", room_options)
-    size_m2 = st.number_input("Enter the size in square meters", min_value=0)
-
-    # Vorhersagefunktionalität
-    if st.button('Predict Rental Price'):
-        predicted_price = predict_price(size_m2, extracted_zip_code, rooms, model)
-        if predicted_price is not None:
-            st.write(f"The predicted price for the apartment is CHF {predicted_price:.2f}")
-        else:
-            st.write("Unable to predict price. Please check your inputs.")
 else:
     # Meldung anzeigen, wenn die Adresse nicht gültig ist
     if address_input:

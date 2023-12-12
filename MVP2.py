@@ -160,18 +160,13 @@ lat, lon = default_lat, default_lon
 # Check for the input type and update coordinates accordingly
 if extracted_zip_code == "non-specific":
     st.error("Please enter a more specific address or zip code in St. Gallen.")
-    lat, lon = 47.424482, 9.376717  # Standard coordinates of St. Gallen
+    lat, lon = default_lat, default_lon  # Reset to standard coordinates of St. Gallen
 elif extracted_zip_code:
-    # Check if the input is only a zip code, update coordinates accordingly
-    if address_input.isdigit() and len(address_input) == 4:
-        # If it's just a zip code, use this zip code for location lookup
-        lat, lon = get_lat_lon_from_zip(extracted_zip_code)
-    else:
-        # If it's a full address, use the address for location lookup
-        lat, lon = get_lat_lon_from_zip(address_input)
+    # Update coordinates based on the input (address or zip code)
+    lat, lon = get_lat_lon_from_zip(address_input)
 else:
     st.write("Please enter a valid address or zip code in St. Gallen.")
-    lat, lon = 47.424482, 9.376717  # Standard coordinates of St. Gallen
+    lat, lon = default_lat, default_lon  # Reset to standard coordinates of St. Gallen
 
 # Karte anzeigen
 map = folium.Map(location=[lat, lon], zoom_start=16)

@@ -8,7 +8,7 @@ from geopy.geocoders import Nominatim
 
 
 # Funktion, um ähnliche Immobilien zu finden
-def find_similar_properties(input_rooms, input_size, data, threshold=10):
+def find_similar_properties(input_rooms, input_size, data, threshold=5):
     similar_properties = data[
         (data['Rooms'].between(input_rooms - 1, input_rooms + 1)) &
         (data['Size_m2'].between(input_size - threshold, input_size + threshold))

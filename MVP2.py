@@ -109,13 +109,13 @@ def predict_price(size_m2, extracted_zip_code, rooms, model):
 
 ## Function to predict the price based on the model
 #def predict_price(size_m2, area_code, rooms, model): OLD VERSION JUST KEPT IT FOR SECURITA REASONS
-    input_features = pd.DataFrame({
-        'Rooms': [rooms],
-        'Size_m2': [size_m2],
-        'area_code': [zip_code]
-    })
-    predicted_price = model.predict(input_features)
-    return predicted_price[0]
+#    input_features = pd.DataFrame({
+#        'Rooms': [rooms],
+#        'Size_m2': [size_m2],
+#        'area_code': [zip_code]
+#    })
+#    predicted_price = model.predict(input_features)
+#    return predicted_price[0]
 
 def extract_zip_from_address(address):
     valid_st_gallen_zip_codes = ['9000', '9001', '9004', '9006', '9007', '9008', '9010', '9011', '9012', '9013', '9014', '9015', '9016', '9020', '9021', '9023', '9024', '9026', '9027', '9028', '9029']
@@ -226,8 +226,9 @@ with tabs[3]:
             pass
 
         if st.button("Next", key='next4', on_click=go_to_next_step):
+            pass
 
-## Step 5: Result
+# Step 5: Result
 with tabs[4]:
     if st.session_state.current_step == 4:
         # Previous button

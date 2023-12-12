@@ -149,7 +149,9 @@ extracted_zip_code = extract_zip_from_address(address_input)
 
 # Streamlit UI
 
-# ... [Vorheriger Code]
+# Standardposition für die Karte setzen (St. Gallen, 9000)
+default_lat, default_lon = 47.424482, 9.376717  # Koordinaten von St. Gallen
+lat, lon = default_lat, default_lon
 
 # Überprüfen, ob die Eingabe eine gültige Postleitzahl aus St. Gallen ist
 if extracted_zip_code == "non-specific":

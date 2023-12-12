@@ -15,7 +15,6 @@ if 'current_step' not in st.session_state:
     st.session_state.current_step = 0
 if 'address' not in st.session_state:
     st.session_state.address = ""
-# Add other necessary session states
 
 # Define functions to handle navigation
 def go_to_next_step():
@@ -158,12 +157,19 @@ def get_lat_lon_from_address_or_zip(input_text):
 # Preprocess data and train the model
 model = preprocess_and_train()
 
-# Streamlit UI
-st.title("Rental Price Prediction")
+# Define functions to handle navigation
+def go_to_next_step():
+    st.session_state.current_step += 1
+
+def go_to_previous_step():
+    st.session_state.current_step -= 1
 
 # Create tabs for each step
 tab_titles = ["Location", "Rooms", "Size", "Current Rent", "Result"]
 tabs = st.tabs(tab_titles)
+
+# Streamlit UI
+st.title("Rental Price Prediction")
 
 # Step 1: Location
 with tabs[0]:
@@ -193,16 +199,16 @@ with tabs[0]:
 # Step 2: Rooms
 with tabs[1]:
     if st.session_state.current_step == 1:
-        # Collect number of rooms
-        # ... your logic here ...
+        rooms = st.selectbox("Select the number of rooms", range(1, 7), key='rooms')
+
         st.button("Previous", on_click=go_to_previous_step)
         st.button("Next", on_click=go_to_next_step)
 
 # Step 3: Size
 with tabs[2]:
     if st.session_state.current_step == 2:
-        # Collect size
-        # ... your logic here ...
+        size_m2 = st.number_input("Enter the size in square meters", min_value=0)
+
         st.button("Previous", on_click=go_to_previous_step)
         st.button("Next", on_click=go_to_next_step)
 
@@ -210,16 +216,37 @@ with tabs[2]:
 with tabs[3]:
     if st.session_state.current_step == 3:
         # Collect current rent
-        # ... your logic here ...
-        st.button("Previous", on_click=go_to_previous_step)
-        st.button("Next", on_click=go_to_next_step)
+        st.session_state.current_rent = st.number_input("Enter your current rent in CHF:", 
+                                                        min_value=0, 
+                                                        value=st.session_state.get('current_rent', 0), 
+                                                        step=10)
 
-# Step 5: Result
+        if st.button("Previous", key='prev4', on_click=go_to_previous_step):
+            # Logic for previous button (if needed)
+            pass
+
+        if st.button("Next", key='next4', on_click=go_to_next_step):
+
+## Step 5: Result
 with tabs[4]:
     if st.session_state.current_step == 4:
+        # Previous button
+        if st.button("Previous", key='prev5'):
+            go_to_previous_step()
+
         # Display results or predictions
-        # ... your logic here ...
-        st.button("Previous", on_click=go_to_previous_step)
+        if st.session_state.address and not st.session_state.address == "non-specific":
+            # Ensure that the necessary data is available
+            if 'size_m2' in st.session_state and 'rooms' in st.session_state:
+                size_m2 = st.session_state.size_m2
+                rooms = st.session_state.rooms
+                extracted_zip_code = extract_zip_code(st.session_state.address)
+                if extracted_zip_code:
+                    predicted_price = predict_price(size_m2, extracted_zip_code, rooms, model)
+                    if predicted_price is not None:
+                        st.write(f"The predicted price for the apartment is CHF {predicted_price:.2f}")
+                    else:
+                        st.write("Unable to predict price. Please check your inputs.")
 
 # Make tabs visible based on the current step
 for i in range(len(tab_titles)):
@@ -249,18 +276,6 @@ else:
     st.write("Please enter a valid address or zip code in St. Gallen.")
     lat, lon = default_lat, default_lon  # Reset to standard coordinates of St. Gallen
 
-# Karte anzeigen
-map = folium.Map(location=[lat, lon], zoom_start=16)
-
-# Marker hinzufügen, wenn eine gültige Adresse oder Postleitzahl eingegeben wurde
-if address_input and extracted_zip_code:
-    folium.Marker(
-        [lat, lon],
-        popup=f"Eingegebene Adresse: {address_input}",
-        icon=folium.Icon(color='red', icon="glyphicon glyphicon-menu-down")
-    ).add_to(map)
-
-folium_static(map)
 
 # Vorhersagefunktionalität nur aktiviert, wenn eine gültige Postleitzahl vorliegt
 if extracted_zip_code and not extracted_zip_code == "non-specific":

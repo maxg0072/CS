@@ -215,54 +215,37 @@ if st.session_state.current_step == 0:
             st.write("Please enter a valid address or zip code in St. Gallen.")
             lat, lon = default_lat, default_lon  # Reset to standard coordinates of St. Gallen
 
-
-        # Vorhersagefunktionalität nur aktiviert, wenn eine gültige Postleitzahl vorliegt
-        if extracted_zip_code and not extracted_zip_code == "non-specific":
-            room_options = list(range(1, 7))  # Liste von 1 bis 6
-            rooms = st.selectbox("Select the number of rooms", room_options)
-            size_m2 = st.number_input("Enter the size in square meters", min_value=0)
-
-            if st.button('Predict Rental Price'):
-                predicted_price = predict_price(size_m2, extracted_zip_code, rooms, model)
-                if predicted_price is not None:
-                    st.write(f"The predicted price for the apartment is CHF {predicted_price:.2f}")
-                else:
-                    st.write("Unable to predict price. Please check your inputs.")
-
 # Step 2: Rooms
 elif st.session_state.current_step == 1:
     with tabs[1]:
         rooms = st.selectbox("Select the number of rooms", range(1, 7), key='rooms_step2')
-
 
 # Step 3: Size
 elif st.session_state.current_step == 2:
     with tabs[2]:
         size_m2 = st.number_input("Enter the size in square meters", min_value=0, key='size_m2_step3')
 
-
 # Step 4: Current Rent
 elif st.session_state.current_step == 3:
     with tabs[3]:
         st.session_state.current_rent = st.number_input("Enter your current rent in CHF:", min_value=0, value=st.session_state.get('current_rent', 0), step=10, key = "current_rent_step4")
 
-
 # Step 5: Result
 elif st.session_state.current_step == 4:
     with tabs[4]:
-        # Display results or predictions
-        if st.session_state.address and not st.session_state.address == "non-specific":
-            if 'size_m2' in st.session_state and 'rooms' in st.session_state:
-                size_m2 = st.session_state.size_m2
-                rooms = st.session_state.rooms
-                extracted_zip_code = extract_zip_code(st.session_state.address)
-                if extracted_zip_code:
-                    predicted_price = predict_price(size_m2, extracted_zip_code, rooms, model)
-                    if predicted_price is not None:
-                        st.write(f"The predicted price for the apartment is CHF {predicted_price:.2f}")
-                    else:
-                        st.write("Unable to predict price. Please check your inputs.")
+        if 'address' in st.session_state and 'rooms' in st.session_state and 'size_m2' in st.session_state:
+            extracted_zip_code = extract_zip_code(st.session_state.address)
+            rooms = st.session_state.rooms
+            size_m2 = st.session_state.size_m2
 
+            if st.button('Predict Rental Price', key='predict_button'):
+                predicted_price = predict_price(size_m2, extracted_zip_code, rooms, model)
+                if predicted_price is not None:
+                    st.write(f"The predicted price for the apartment is CHF {predicted_price:.2f}")
+                else:
+                    st.error("Unable to predict price. Please check your inputs.")
+        else:
+            st.error("Please enter all required information in the previous steps.")
 
 # Placing the navigation buttons outside and below the tab system
 st.markdown("---")  # Optional line to separate the content from the buttons

@@ -101,6 +101,16 @@ def predict_price(size_m2, extracted_zip_code, rooms, model):
     predicted_price = model.predict(input_features)
     return predicted_price[0]
 
+# Function to get latitude and longitude from an address
+def get_lat_lon_from_zip(address):
+    geolocator = Nominatim(user_agent="http")
+    location = geolocator.geocode(address)
+    if location:
+        return location.latitude, location.longitude
+    else:
+        return None, None
+
+
 # Streamlit UI
 st.title("Rental Price Prediction")
 
@@ -112,6 +122,17 @@ address_input = st.text_input("Enter an address or zip code in St. Gallen:")
 
 # Extrahieren der Postleitzahl aus der Eingabe
 extracted_zip_code = extract_zip_from_address(address_input)
+
+# Display the map based on the address or zip code
+if address_input:
+    lat, lon = get_lat_lon_from_zip(address_input)
+    if lat and lon:
+        map = folium.Map(location=[lat, lon], zoom_start=16)
+        folium.Marker([lat, lon]).add_to(map)
+        folium_static(map)
+    else:
+        st.write("Invalid zip code or location not found.")
+
 
 # Input für die Anzahl der Zimmer und Größe in Quadratmetern
 rooms = st.number_input("Enter the number of rooms", min_value=1, max_value=10)

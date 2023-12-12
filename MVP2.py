@@ -168,8 +168,26 @@ tabs = st.tabs(tab_titles)
 # Step 1: Location
 with tabs[0]:
     if st.session_state.current_step == 0:
-        st.session_state.address = st.text_input("Enter an address or zip code in St. Gallen:")
-        # ... map display logic here ...
+        address_input = st.text_input("Enter an address or zip code in St. Gallen:")
+        extracted_zip_code = extract_zip_from_address(address_input)
+
+        lat, lon = get_lat_lon_from_address_or_zip(address_input) if extracted_zip_code else (default_lat, default_lon)
+
+        if extracted_zip_code == "non-specific":
+            st.error("Please enter a more specific address or zip code in St. Gallen.")
+        elif extracted_zip_code:
+            # Display map
+            map = folium.Map(location=[lat, lon], zoom_start=16)
+            if address_input:
+                folium.Marker(
+                    [lat, lon],
+                    popup=f"Eingegebene Adresse: {address_input}",
+                    icon=folium.Icon(color='red', icon="glyphicon glyphicon-menu-down")
+                ).add_to(map)
+            folium_static(map)
+        else:
+            st.write("Please enter a valid address or zip code in St. Gallen.")
+
         st.button("Next", on_click=go_to_next_step)
 
 # Step 2: Rooms

@@ -1,0 +1,12 @@
+[theme]
+font = "Lato"
+st.markdown(
+    """
+    <style>
+    .reportview-container {
+        background: url("https://www.estliving.com/wp-content/uploads/2015/09/Est-Magazine-Lake-House-Wespi-de-Meuron-Romeo-architects8-11-1280x720.jpg");
+    }
+   </style>
+    """,
+    unsafe_allow_html=True
+)

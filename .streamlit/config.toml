@@ -1,3 +1,11 @@
-[theme]
-base="dark"
-primaryColor="purple"
+st.markdown(
+    f"""
+    <style>
+    .reportview-container {{
+        background: url("https://raw.githubusercontent.com/maxg0072/CS/patch-2/pexels-mudassir-ali-3970396.jpg");
+        background-size: cover;
+    }}
+    </style>
+    """,
+    unsafe_allow_html=True
+)

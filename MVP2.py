@@ -194,6 +194,41 @@ if st.session_state.current_step == 0:
         else:
             st.write("Please enter a valid address or zip code in St. Gallen.")
 
+        # Extrahieren der Postleitzahl aus der Eingabe
+        extracted_zip_code = extract_zip_from_address(address_input)
+
+        # Use the function to get latitude and longitude from the input
+        lat, lon = get_lat_lon_from_address_or_zip(address_input) if extracted_zip_code else (default_lat, default_lon)
+
+        # Standardkoordinaten für St. Gallen setzen
+        default_lat, default_lon = 47.424482, 9.376717
+        lat, lon = default_lat, default_lon
+
+        # Check for the input type and update coordinates accordingly
+        if extracted_zip_code == "non-specific":
+            st.error("Please enter a more specific address or zip code in St. Gallen.")
+            lat, lon = default_lat, default_lon  # Reset to standard coordinates of St. Gallen
+        elif extracted_zip_code:
+            # Get lat, lon based on either the full address or zip code
+            lat, lon = get_lat_lon_from_address_or_zip(address_input) if address_input else (default_lat, default_lon)
+        else:
+            st.write("Please enter a valid address or zip code in St. Gallen.")
+            lat, lon = default_lat, default_lon  # Reset to standard coordinates of St. Gallen
+
+
+        # Vorhersagefunktionalität nur aktiviert, wenn eine gültige Postleitzahl vorliegt
+        if extracted_zip_code and not extracted_zip_code == "non-specific":
+            room_options = list(range(1, 7))  # Liste von 1 bis 6
+            rooms = st.selectbox("Select the number of rooms", room_options)
+            size_m2 = st.number_input("Enter the size in square meters", min_value=0)
+
+            if st.button('Predict Rental Price'):
+                predicted_price = predict_price(size_m2, extracted_zip_code, rooms, model)
+                if predicted_price is not None:
+                    st.write(f"The predicted price for the apartment is CHF {predicted_price:.2f}")
+                else:
+                    st.write("Unable to predict price. Please check your inputs.")
+
 # Step 2: Rooms
 elif st.session_state.current_step == 1:
     with tabs[1]:
@@ -242,40 +277,3 @@ with col2:
     if st.session_state.current_step < num_steps - 1:
         if st.button("Next", key="next_button"):
             st.session_state.current_step += 1
-# Input für eine Adresse oder Postleitzahl
-address_input = st.text_input("Enter an address or zip code in St. Gallen:")
-
-# Extrahieren der Postleitzahl aus der Eingabe
-extracted_zip_code = extract_zip_from_address(address_input)
-
-# Use the function to get latitude and longitude from the input
-lat, lon = get_lat_lon_from_address_or_zip(address_input) if extracted_zip_code else (default_lat, default_lon)
-
-# Standardkoordinaten für St. Gallen setzen
-default_lat, default_lon = 47.424482, 9.376717
-lat, lon = default_lat, default_lon
-
-# Check for the input type and update coordinates accordingly
-if extracted_zip_code == "non-specific":
-    st.error("Please enter a more specific address or zip code in St. Gallen.")
-    lat, lon = default_lat, default_lon  # Reset to standard coordinates of St. Gallen
-elif extracted_zip_code:
-    # Get lat, lon based on either the full address or zip code
-    lat, lon = get_lat_lon_from_address_or_zip(address_input) if address_input else (default_lat, default_lon)
-else:
-    st.write("Please enter a valid address or zip code in St. Gallen.")
-    lat, lon = default_lat, default_lon  # Reset to standard coordinates of St. Gallen
-
-
-# Vorhersagefunktionalität nur aktiviert, wenn eine gültige Postleitzahl vorliegt
-if extracted_zip_code and not extracted_zip_code == "non-specific":
-    room_options = list(range(1, 7))  # Liste von 1 bis 6
-    rooms = st.selectbox("Select the number of rooms", room_options)
-    size_m2 = st.number_input("Enter the size in square meters", min_value=0)
-
-    if st.button('Predict Rental Price'):
-        predicted_price = predict_price(size_m2, extracted_zip_code, rooms, model)
-        if predicted_price is not None:
-            st.write(f"The predicted price for the apartment is CHF {predicted_price:.2f}")
-        else:
-            st.write("Unable to predict price. Please check your inputs.")

@@ -162,8 +162,13 @@ if extracted_zip_code == "non-specific":
     st.error("Please enter a more specific address or zip code in St. Gallen.")
     lat, lon = 47.424482, 9.376717  # Standard coordinates of St. Gallen
 elif extracted_zip_code:
-    # Update coordinates based on extracted zip code or address
-    lat, lon = get_lat_lon_from_zip(address_input) if address_input else (47.424482, 9.376717)
+    # Check if the input is only a zip code, update coordinates accordingly
+    if address_input.isdigit() and len(address_input) == 4:
+        # If it's just a zip code, use this zip code for location lookup
+        lat, lon = get_lat_lon_from_zip(extracted_zip_code)
+    else:
+        # If it's a full address, use the address for location lookup
+        lat, lon = get_lat_lon_from_zip(address_input)
 else:
     st.write("Please enter a valid address or zip code in St. Gallen.")
     lat, lon = 47.424482, 9.376717  # Standard coordinates of St. Gallen

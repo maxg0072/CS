@@ -126,6 +126,7 @@ def extract_zip_from_address(address):
                 return component.strip()
     return None
 
+#gets te lon and lat from the address/zip input
 def get_lat_lon_from_zip(address):
     # Append "St. Gallen" to the address to localize the search
     localized_address = address + ", St. Gallen, Switzerland"
@@ -152,12 +153,12 @@ extracted_zip_code = extract_zip_from_address(address_input)
 default_lat, default_lon = 47.424482, 9.376717
 lat, lon = default_lat, default_lon
 
-# Überprüfen, ob die Eingabe eine gültige Postleitzahl aus St. Gallen ist
+# Check if input is non-specific
 if extracted_zip_code == "non-specific":
     st.error("Please enter a more specific address or zip code in St. Gallen.")
 elif extracted_zip_code:
-    # Koordinaten basierend auf der extrahierten Postleitzahl aktualisieren
-    lat, lon = get_lat_lon_from_zip(extracted_zip_code)
+    # Update coordinates based on extracted zip code or address
+    lat, lon = get_lat_lon_from_zip(address_input)  # Use original input for geolocation
 else:
     st.write("Please enter a valid address or zip code in St. Gallen.")
 

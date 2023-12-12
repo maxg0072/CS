@@ -174,7 +174,7 @@ tabs = st.tabs(tab_titles)
 # Step 1: Location
 if st.session_state.current_step == 0:
     with tabs[0]:
-        address_input = st.text_input("Enter an address or zip code in St. Gallen:")
+        address_input = st.text_input("Enter an address or zip code in St. Gallen:", key='address_input_step1')
         extracted_zip_code = extract_zip_from_address(address_input)
 
         lat, lon = get_lat_lon_from_address_or_zip(address_input) if extracted_zip_code else (default_lat, default_lon)
@@ -194,38 +194,23 @@ if st.session_state.current_step == 0:
         else:
             st.write("Please enter a valid address or zip code in St. Gallen.")
 
-        if st.button("Next", on_click=go_to_next_step):
-            st.session_state.current_step += 1
-
 # Step 2: Rooms
 elif st.session_state.current_step == 1:
     with tabs[1]:
-        rooms = st.selectbox("Select the number of rooms", range(1, 7), key='rooms')
+        rooms = st.selectbox("Select the number of rooms", range(1, 7), key='rooms_step2')
 
-        if st.button("Previous", on_click=go_to_previous_step):
-            st.session_state.current_step -= 1
-        if st.button("Next", on_click=go_to_next_step):
-            st.session_state.current_step += 1
 
 # Step 3: Size
 elif st.session_state.current_step == 2:
     with tabs[2]:
-        size_m2 = st.number_input("Enter the size in square meters", min_value=0)
+        size_m2 = st.number_input("Enter the size in square meters", min_value=0, key='size_m2_step3')
 
-        if st.button("Previous", on_click=go_to_previous_step):
-            st.session_state.current_step -= 1
-        if st.button("Next", on_click=go_to_next_step):
-            st.session_state.current_step += 1
 
 # Step 4: Current Rent
 elif st.session_state.current_step == 3:
     with tabs[3]:
-        st.session_state.current_rent = st.number_input("Enter your current rent in CHF:", min_value=0, value=st.session_state.get('current_rent', 0), step=10)
+        st.session_state.current_rent = st.number_input("Enter your current rent in CHF:", min_value=0, value=st.session_state.get('current_rent', 0), step=10, key = "current_rent_step4")
 
-        if st.button("Previous", key='prev4', on_click=go_to_previous_step):
-            st.session_state.current_step -= 1
-        if st.button("Next", key='next4', on_click=go_to_next_step):
-            st.session_state.current_step += 1
 
 # Step 5: Result
 elif st.session_state.current_step == 4:
@@ -243,8 +228,6 @@ elif st.session_state.current_step == 4:
                     else:
                         st.write("Unable to predict price. Please check your inputs.")
 
-        if st.button("Previous", key='prev5'):
-            st.session_state.current_step -= 1
 
 # Navigation buttons
 if st.session_state.current_step > 0:

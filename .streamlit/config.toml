@@ -2,7 +2,7 @@ st.markdown(
     """
     <style>
     .reportview-container {
-        background: url("https://raw.githubusercontent.com/maxg0072/CS/patch-2/pexels-mudassir-ali-3970396.jpg");
+        background: url("https://github.com/maxg0072/CS/blob/patch-2/pexels-mudassir-ali-3970396.jpg");
     }
    </style>
     """,

@@ -128,17 +128,15 @@ def extract_zip_from_address(address):
 
 def get_lat_lon_from_address_or_zip(input_text):
     geolocator = Nominatim(user_agent="http")
-    # If the input is a zip code, append "St. Gallen" to it
+    # Add 'St. Gallen' suffix for zip codes to narrow down the search
     if input_text.isdigit() and len(input_text) == 4:
-        location = geolocator.geocode(f"{input_text}, St. Gallen, Switzerland")
-    else:
-        # If it's a full address, search it as is
-        location = geolocator.geocode(input_text + ", St. Gallen, Switzerland")
+        input_text += ", St. Gallen, Switzerland"
 
+    location = geolocator.geocode(input_text)
     if location:
         return location.latitude, location.longitude
     else:
-        return None, None
+        return default_lat, default_lon  # Return default coordinates if no location is found
 
 # Preprocess data and train the model
 model = preprocess_and_train()
@@ -151,6 +149,9 @@ address_input = st.text_input("Enter an address or zip code in St. Gallen:")
 
 # Extrahieren der Postleitzahl aus der Eingabe
 extracted_zip_code = extract_zip_from_address(address_input)
+
+# Use the function to get latitude and longitude from the input
+lat, lon = get_lat_lon_from_input(address_input) if extracted_zip_code else (default_lat, default_lon)
 
 # Standardkoordinaten für St. Gallen setzen
 default_lat, default_lon = 47.424482, 9.376717

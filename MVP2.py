@@ -140,14 +140,18 @@ if st.button('Predict Rental Price'):
             similar_properties = find_similar_properties(rooms, size_m2, real_estate_data)
             if not similar_properties.empty:
                 st.markdown("### Ähnliche Immobilien:")
-            for index, row in similar_properties.iterrows():
-                st.markdown(
-                    f"* **Typ:** {row['Property_Type']} \n"
-                    f"  * **Größe:** {row['Size_m2']} Quadratmeter \n"
-                    f"  * **Preis:** CHF {row['price_per_month']} pro Monat \n"
-                    f"  * **Ort:** {row['area_code']} \n"
-                    f"  * **Website:** [Link]({row['Websiten']})"
-            )
+                # Erstellen von zwei Spalten für die Anzeige der Immobilien
+                col1, col2 = st.columns(2)
+                for index, row in enumerate(similar_properties.iterrows()):
+                    current_col = col1 if index % 2 == 0 else col2
+                    with current_col:
+                        st.markdown(
+                            f"* **Typ:** {row[1]['Property_Type']} \n"
+                            f"  * **Größe:** {row[1]['Size_m2']} Quadratmeter \n"
+                            f"  * **Preis:** CHF {row[1]['price_per_month']} pro Monat \n"
+                            f"  * **Ort:** {row[1]['area_code']} \n"
+                            f"  * **Website:** [Link]({row[1]['Websiten']})"
+                        )
             else:
                 st.write("Keine ähnlichen Immobilien gefunden.")
 

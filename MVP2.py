@@ -126,12 +126,16 @@ def extract_zip_from_address(address):
                 return component.strip()
     return None
 
-#gets te lon and lat from the address/zip input
-def get_lat_lon_from_zip(address):
-    # Append "St. Gallen" to the address to localize the search
-    localized_address = address + ", St. Gallen, Switzerland"
+# Function to get latitude and longitude from an address or zip code
+def get_lat_lon_from_zip(address_or_zip):
+    # Localize the search to St. Gallen if it's a zip code
+    if address_or_zip.isdigit() and len(address_or_zip) == 4:
+        search_query = f"{address_or_zip}, St. Gallen, Switzerland"
+    else:
+        search_query = address_or_zip + ", St. Gallen, Switzerland"
+
     geolocator = Nominatim(user_agent="http")
-    location = geolocator.geocode(localized_address)
+    location = geolocator.geocode(search_query)
     if location:
         return location.latitude, location.longitude
     else:
@@ -153,12 +157,12 @@ extracted_zip_code = extract_zip_from_address(address_input)
 default_lat, default_lon = 47.424482, 9.376717
 lat, lon = default_lat, default_lon
 
-# Check if input is non-specific
+# Check for the input type and update coordinates accordingly
 if extracted_zip_code == "non-specific":
     st.error("Please enter a more specific address or zip code in St. Gallen.")
 elif extracted_zip_code:
     # Update coordinates based on extracted zip code or address
-    lat, lon = get_lat_lon_from_zip(address_input)  # Use original input for geolocation
+    lat, lon = get_lat_lon_from_zip(address_input)
 else:
     st.write("Please enter a valid address or zip code in St. Gallen.")
 

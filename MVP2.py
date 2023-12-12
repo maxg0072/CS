@@ -7,6 +7,9 @@ import folium
 from streamlit_folium import folium_static
 from geopy.geocoders import Nominatim
 
+# Standard coordinates for St. Gallen
+default_lat, default_lon = 47.424482, 9.376717
+
 # Backend Code: Data Preprocessing and Model Training
 def preprocess_and_train():
     # Load the dataset (replace with your actual file path)
@@ -151,7 +154,7 @@ address_input = st.text_input("Enter an address or zip code in St. Gallen:")
 extracted_zip_code = extract_zip_from_address(address_input)
 
 # Use the function to get latitude and longitude from the input
-lat, lon = get_lat_lon_from_input(address_input) if extracted_zip_code else (default_lat, default_lon)
+lat, lon = get_lat_lon_from_address_or_zip(address_input) if extracted_zip_code else (default_lat, default_lon)
 
 # Standardkoordinaten für St. Gallen setzen
 default_lat, default_lon = 47.424482, 9.376717

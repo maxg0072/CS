@@ -265,4 +265,4 @@ with col2:
 
 # Update the selected tab after the button click
 if st.session_state.current_step != current_tab.index:
-    st.experimental_rerun()
+    st.rerun()

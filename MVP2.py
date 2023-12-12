@@ -24,10 +24,6 @@ def go_to_next_step():
 def go_to_previous_step():
     st.session_state.current_step -= 1
 
-# Create tabs for each step
-tab_titles = ["Location", "Rooms", "Size", "Current Rent", "Result"]
-tabs = st.tabs(tab_titles)
-
 # Backend Code: Data Preprocessing and Model Training
 def preprocess_and_train():
     # Load the dataset (replace with your actual file path)
@@ -164,6 +160,52 @@ model = preprocess_and_train()
 
 # Streamlit UI
 st.title("Rental Price Prediction")
+
+# Create tabs for each step
+tab_titles = ["Location", "Rooms", "Size", "Current Rent", "Result"]
+tabs = st.tabs(tab_titles)
+
+# Step 1: Location
+with tabs[0]:
+    if st.session_state.current_step == 0:
+        st.session_state.address = st.text_input("Enter an address or zip code in St. Gallen:")
+        # ... map display logic here ...
+        st.button("Next", on_click=go_to_next_step)
+
+# Step 2: Rooms
+with tabs[1]:
+    if st.session_state.current_step == 1:
+        # Collect number of rooms
+        # ... your logic here ...
+        st.button("Previous", on_click=go_to_previous_step)
+        st.button("Next", on_click=go_to_next_step)
+
+# Step 3: Size
+with tabs[2]:
+    if st.session_state.current_step == 2:
+        # Collect size
+        # ... your logic here ...
+        st.button("Previous", on_click=go_to_previous_step)
+        st.button("Next", on_click=go_to_next_step)
+
+# Step 4: Current Rent
+with tabs[3]:
+    if st.session_state.current_step == 3:
+        # Collect current rent
+        # ... your logic here ...
+        st.button("Previous", on_click=go_to_previous_step)
+        st.button("Next", on_click=go_to_next_step)
+
+# Step 5: Result
+with tabs[4]:
+    if st.session_state.current_step == 4:
+        # Display results or predictions
+        # ... your logic here ...
+        st.button("Previous", on_click=go_to_previous_step)
+
+# Make tabs visible based on the current step
+for i in range(len(tab_titles)):
+    tabs[i].empty() if i != st.session_state.current_step else None
 
 # Input für eine Adresse oder Postleitzahl
 address_input = st.text_input("Enter an address or zip code in St. Gallen:")

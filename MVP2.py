@@ -144,7 +144,7 @@ if st.button('Predict Rental Price'):
                 col1, col2 = st.columns(2)
 
                 # Beschränke die Anzeige auf die ersten 6 Immobilien
-                for index, row in similar_properties.head(6).iterrows():
+                for index, row in similar_properties.head(8).iterrows():
                     current_col = col1 if index % 2 == 0 else col2
                     with current_col:
                         website_url = row['Websiten'].lstrip('/')

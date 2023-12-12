@@ -140,7 +140,8 @@ if st.button('Predict Rental Price'):
             similar_properties = find_similar_properties(rooms, size_m2, real_estate_data)
             if not similar_properties.empty:
                 st.write("Ähnliche Immobilien:")
-                st.dataframe(similar_properties[['Property_Type', 'Rooms', 'Size_m2', 'area_code', 'Websiten']])
+            for index, row in similar_properties.iterrows():
+                st.write(f"Es gibt auch eine ähnliche Immobilie: {row['Property_Type']} mit {row['Size_m2']} Quadratmetern, die CHF {row['price_per_month']} pro Monat kostet, befindet sich in {row['area_code']}. Du findest diese Immobilie auf {row['Websiten']}.")
             else:
                 st.write("Keine ähnlichen Immobilien gefunden.")
 

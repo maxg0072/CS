@@ -20,9 +20,7 @@ def main():
     st.title("Rental Price Prediction")
     # Ihr übriger Code...
 
-if __name__ == "__main__":
-    main()
-    
+
 # Funktion, um ähnliche Immobilien zu finden
 def find_similar_properties(input_rooms, input_size, data, threshold=10):
     similar_properties = data[
@@ -180,3 +178,5 @@ if st.button('Predict Rental Price'):
             st.write("Unable to predict price. Please check your inputs.")
     else:
         st.write("Please enter a valid address or zip code in St. Gallen.")
+if __name__ == "__main__":
+    main()

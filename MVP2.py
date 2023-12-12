@@ -157,23 +157,23 @@ def get_lat_lon_from_address_or_zip(input_text):
 # Preprocess data and train the model
 model = preprocess_and_train()
 
-# Define functions to handle navigation
-def go_to_next_step():
-    st.session_state.current_step += 1
+# Streamlit UI
+st.title("Rental Price Prediction")
 
-def go_to_previous_step():
-    st.session_state.current_step -= 1
+# Initialize session state for current step
+if 'current_step' not in st.session_state:
+    st.session_state.current_step = 0
+
+# Define the number of steps or tabs
+num_steps = 5
 
 # Create tabs for each step
 tab_titles = ["Location", "Rooms", "Size", "Current Rent", "Result"]
 tabs = st.tabs(tab_titles)
 
-# Streamlit UI
-st.title("Rental Price Prediction")
-
 # Step 1: Location
-with tabs[0]:
-    if st.session_state.current_step == 0:
+if st.session_state.current_step == 0:
+    with tabs[0]:
         address_input = st.text_input("Enter an address or zip code in St. Gallen:")
         extracted_zip_code = extract_zip_from_address(address_input)
 
@@ -194,50 +194,44 @@ with tabs[0]:
         else:
             st.write("Please enter a valid address or zip code in St. Gallen.")
 
-        st.button("Next", on_click=go_to_next_step)
+        if st.button("Next", on_click=go_to_next_step):
+            st.session_state.current_step += 1
 
 # Step 2: Rooms
-with tabs[1]:
-    if st.session_state.current_step == 1:
+elif st.session_state.current_step == 1:
+    with tabs[1]:
         rooms = st.selectbox("Select the number of rooms", range(1, 7), key='rooms')
 
-        st.button("Previous", on_click=go_to_previous_step)
-        st.button("Next", on_click=go_to_next_step)
+        if st.button("Previous", on_click=go_to_previous_step):
+            st.session_state.current_step -= 1
+        if st.button("Next", on_click=go_to_next_step):
+            st.session_state.current_step += 1
 
 # Step 3: Size
-with tabs[2]:
-    if st.session_state.current_step == 2:
+elif st.session_state.current_step == 2:
+    with tabs[2]:
         size_m2 = st.number_input("Enter the size in square meters", min_value=0)
 
-        st.button("Previous", on_click=go_to_previous_step)
-        st.button("Next", on_click=go_to_next_step)
+        if st.button("Previous", on_click=go_to_previous_step):
+            st.session_state.current_step -= 1
+        if st.button("Next", on_click=go_to_next_step):
+            st.session_state.current_step += 1
 
 # Step 4: Current Rent
-with tabs[3]:
-    if st.session_state.current_step == 3:
-        # Collect current rent
-        st.session_state.current_rent = st.number_input("Enter your current rent in CHF:", 
-                                                        min_value=0, 
-                                                        value=st.session_state.get('current_rent', 0), 
-                                                        step=10)
+elif st.session_state.current_step == 3:
+    with tabs[3]:
+        st.session_state.current_rent = st.number_input("Enter your current rent in CHF:", min_value=0, value=st.session_state.get('current_rent', 0), step=10)
 
         if st.button("Previous", key='prev4', on_click=go_to_previous_step):
-            # Logic for previous button (if needed)
-            pass
-
+            st.session_state.current_step -= 1
         if st.button("Next", key='next4', on_click=go_to_next_step):
-            pass
+            st.session_state.current_step += 1
 
 # Step 5: Result
-with tabs[4]:
-    if st.session_state.current_step == 4:
-        # Previous button
-        if st.button("Previous", key='prev5'):
-            go_to_previous_step()
-
+elif st.session_state.current_step == 4:
+    with tabs[4]:
         # Display results or predictions
         if st.session_state.address and not st.session_state.address == "non-specific":
-            # Ensure that the necessary data is available
             if 'size_m2' in st.session_state and 'rooms' in st.session_state:
                 size_m2 = st.session_state.size_m2
                 rooms = st.session_state.rooms
@@ -248,6 +242,9 @@ with tabs[4]:
                         st.write(f"The predicted price for the apartment is CHF {predicted_price:.2f}")
                     else:
                         st.write("Unable to predict price. Please check your inputs.")
+
+        if st.button("Previous", key='prev5'):
+            st.session_state.current_step -= 1
 
 # Make tabs visible based on the current step
 for i in range(len(tab_titles)):

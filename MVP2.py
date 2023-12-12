@@ -248,11 +248,11 @@ elif st.session_state.current_step == 4:
 
 # Navigation buttons
 if st.session_state.current_step > 0:
-    if st.button("Previous"):
+    if st.button("Previous", key = "prev_button"):
         st.session_state.current_step -= 1
 
 if st.session_state.current_step < num_steps - 1:
-    if st.button("Next"):
+    if st.button("Next", key = "next_button"):
         st.session_state.current_step += 1
 
 # Input für eine Adresse oder Postleitzahl

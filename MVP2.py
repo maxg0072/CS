@@ -137,7 +137,7 @@ if st.button('Predict Rental Price'):
         if predicted_price is not None:
             st.write(f"The predicted price for the apartment is CHF {predicted_price:.2f}")
 
-            # Ähnliche Immobilien finden und anzeigen
+            # Ähnliche Immobilien finden und anzeigen 
             similar_properties = find_similar_properties(rooms, size_m2, real_estate_data)
             if not similar_properties.empty:
                 st.markdown("### Ähnliche Immobilien:")

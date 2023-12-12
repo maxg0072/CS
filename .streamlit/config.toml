@@ -1,13 +1,6 @@
-st.markdown("""
-    <style>
-    .outer-container {
-        padding: 10px;
-        background-color: #07268b;  /* Farbe der äußeren Ränder */
-    }
-    .inner-container {
-        background-color: white;  /* Farbe des inneren Bereichs */
-        padding: 20px;
-        border-radius: 5px;
-    }
-    </style>
-""", unsafe_allow_html=True)
+[ theme]
+primaryColor="#f63366" 
+backgroundColor="#07268b" 
+secondaryBackgroundColor="#31333F" 
+textColor="#fafafa"
+font="sans serif"

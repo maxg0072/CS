@@ -3,11 +3,30 @@ import pandas as pd
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 import joblib
+import folium
+from streamlit_folium import folium_static
+from geopy.geocoders import Nominatim
+
+# Standard coordinates for St. Gallen
+default_lat, default_lon = 47.424482, 9.376717
+
+# Initialize session state variables
+if 'current_step' not in st.session_state:
+    st.session_state.current_step = 0
+if 'address' not in st.session_state:
+    st.session_state.address = ""
+
+# Define functions to handle navigation
+def go_to_next_step():
+    st.session_state.current_step += 1
+
+def go_to_previous_step():
+    st.session_state.current_step -= 1
 
 # Backend Code: Data Preprocessing and Model Training
 def preprocess_and_train():
     # Load the dataset (replace with your actual file path)
-    real_estate_data = pd.read_excel('/Users/maxgrau/Desktop/CS/real-estate-scraped-data.xlsx')
+    real_estate_data = pd.read_excel('real-estate-scraped-data.xlsx')
 
     # Data Preprocessing
     # Define the function to split 'Col3'
@@ -61,15 +80,99 @@ def preprocess_and_train():
 
     return model
 
-# Function to predict the price based on the model
-def predict_price(size_m2, area_code, rooms, model):
+def extract_zip_code(input_text):
+    # Zerlegen des Strings anhand von Kommata oder Leerzeichen
+    parts = input_text.replace(',', ' ').split()
+
+    # Durchsuchen der Teile nach einer Zahlenfolge
+    for part in parts:
+        if part.isdigit() and len(part) == 4:  # Schweizer Postleitzahlen haben 4 Ziffern
+            return part
+    return None  # Keine gültige Postleitzahl gefunden
+
+#NEWER VERSION PRICE PREDICT NOT MY AEREA SO NOT SURE
+def predict_price(size_m2, extracted_zip_code, rooms, model):
+    # Ensure that size_m2 and rooms are numeric and non-negative
+    try:
+        size_m2 = float(size_m2)
+        rooms = int(rooms)
+        if size_m2 < 0 or rooms < 0:
+            raise ValueError("Size and rooms must be non-negative.")
+    except ValueError as e:
+        st.error(f"Invalid input for size or rooms: {e}")
+        return None
+
+    # Ensure that extracted_zip_code is a valid Swiss zip code (4 digits)
+    try:
+        area_code = int(extracted_zip_code)
+        if not (1000 <= area_code <= 9999):
+            raise ValueError("Invalid Swiss zip code.")
+    except ValueError as e:
+        st.error(f"Invalid zip code: {e}")
+        return None
+
+    # Create the input features DataFrame
     input_features = pd.DataFrame({
         'Rooms': [rooms],
         'Size_m2': [size_m2],
         'area_code': [area_code]
     })
+
+    # Predict the price using the model
     predicted_price = model.predict(input_features)
     return predicted_price[0]
+
+## Function to predict the price based on the model
+#def predict_price(size_m2, area_code, rooms, model): OLD VERSION JUST KEPT IT FOR SECURITA REASONS
+#    input_features = pd.DataFrame({
+#        'Rooms': [rooms],
+#        'Size_m2': [size_m2],
+#        'area_code': [zip_code]
+#    })
+#    predicted_price = model.predict(input_features)
+#    return predicted_price[0]
+
+def extract_zip_from_address(address):
+    valid_st_gallen_zip_codes = ['9000', '9001', '9004', '9006', '9007', '9008', '9010', '9011', '9012', '9013', '9014', '9015', '9016', '9020', '9021', '9023', '9024', '9026', '9027', '9028', '9029']
+    non_specific_inputs = ['st. gallen', 'st gallen', 'sankt gallen']
+
+    # Check for non-specific input
+    if address.lower().strip() in non_specific_inputs:
+        return "non-specific"
+
+    # If the input is a specific zip code, use it as is
+    if address.strip() in valid_st_gallen_zip_codes:
+        return address.strip()
+
+    # Otherwise, append ", St. Gallen" to localize the search
+    address += ", St. Gallen"
+
+    # Extract zip code from the full address
+    geolocator = Nominatim(user_agent="http")
+    location = geolocator.geocode(address, country_codes='CH')
+    if location:
+        address_components = location.raw.get('display_name', '').split(',')
+        for component in address_components:
+            if component.strip() in valid_st_gallen_zip_codes:
+                return component.strip()
+    return None
+
+def get_lat_lon_from_address_or_zip(input_text):
+    geolocator = Nominatim(user_agent="http")
+    # Add 'St. Gallen' suffix for zip codes to narrow down the search
+    if input_text.isdigit() and len(input_text) == 4:
+        input_text += ", St. Gallen, Switzerland"
+
+    location = geolocator.geocode(input_text)
+    if location:
+        return location.latitude, location.longitude
+    else:
+        return default_lat, default_lon  # Return default coordinates if no location is found
+
+
+def update_step(new_step):
+    st.session_state.current_step = new_step
+    st.experimental_rerun()
 
 # Preprocess data and train the model
 model = preprocess_and_train()
@@ -77,17 +180,87 @@ model = preprocess_and_train()
 # Streamlit UI
 st.title("Rental Price Prediction")
 
-# Dropdown for area_code
-area_code_options = [9000, 9001, 9004, 9006, 9007, 9008, 9010, 9011, 9012, 9013, 9014, 9015, 9016, 9020, 9021, 9023, 9024, 9026, 9027, 9028, 9029]
-area_code = st.selectbox("Select the area code", area_code_options)
+# Define the steps
+steps = ["Location", "Rooms", "Size", "My Current Rent", "Results"]
 
-# Dropdown for rooms
-room_options = list(range(1, 7))  # Creating a list from 1 to 6
-rooms = st.selectbox("Select the number of rooms", room_options)
+# Initialize session state for current step
+if 'current_step' not in st.session_state:
+    st.session_state.current_step = 0
 
-# Input for size in square meters
-size_m2 = st.number_input("Enter the size in square meters", min_value=0)
+# Function to render the content of each step
+def render_step(step):
+    if step == 0:
+        # Step 1: Location
+        address_input = st.text_input("Please enter an address or zip code in St. Gallen:", key="address_input_step1")
 
-if st.button('Predict Rental Price'):
-    predicted_price = predict_price(size_m2, area_code, rooms, model)
-    st.write(f"The predicted price for the apartment is CHF {predicted_price:.2f}")
+        if address_input:
+            st.session_state.address = address_input  # Store the address input
+            extracted_zip_code = extract_zip_from_address(address_input)
+            st.session_state.extracted_zip_code = extracted_zip_code  # Store the extracted zip code
+
+            lat, lon = get_lat_lon_from_address_or_zip(address_input) if extracted_zip_code else (default_lat, default_lon)
+
+            if extracted_zip_code == "non-specific":
+                st.error("Please enter a more specific address or zip code in St. Gallen.")
+            elif extracted_zip_code:
+                # Display map
+                map = folium.Map(location=[lat, lon], zoom_start=16)
+                folium.Marker(
+                    [lat, lon],
+                    popup=f"Eingegebene Adresse: {address_input}",
+                    icon=folium.Icon(color='red', icon="glyphicon glyphicon-menu-down")
+                ).add_to(map)
+                folium_static(map)
+            else:
+                st.error("Please enter a valid address or zip code in St. Gallen.")
+    
+    elif step == 1:
+        #step 2 rooms
+                st.session_state.rooms = st.selectbox("Select the number of rooms", range(1, 7), key='rooms_step2')
+
+        # Step 3: Size
+    elif step == 2:
+            st.session_state.size_m2 = st.number_input("Enter the size in square meters", min_value=0, key='size_m2_step3')
+
+        # Step 4: Current Rent
+    elif step == 3:
+            st.session_state.current_rent = st.number_input("Enter your current rent in CHF:", min_value=0, value=st.session_state.get('current_rent', 0), step=10, key = "current_rent_step4")
+
+        # Step 5: Result
+    elif step == 4:
+                if 'extracted_zip_code' in st.session_state and 'rooms' in st.session_state and 'size_m2' in st.session_state:
+                    # Use st.session_state variables for prediction
+                    if st.button('Predict Rental Price', key='predict_button'):
+                        predicted_price = predict_price(st.session_state.size_m2, st.session_state.extracted_zip_code, st.session_state.rooms, model)
+                        if predicted_price is not None:
+                            st.write(f"The predicted price for the apartment is CHF {predicted_price:.2f}")
+                        else:
+                            st.error("Unable to predict price. Please check your inputs.")
+                else:
+                        st.error("Please enter all required information in the previous steps.")
+
+# Function to render navigation buttons
+def render_navigation_buttons():
+    col1, col2 = st.columns([1, 1])
+    
+    with col1:
+        if st.session_state.current_step > 0:
+            if st.button('Previous'):
+                st.session_state.current_step -= 1
+                render_step(st.session_state.current_step)
+    
+    with col2:
+        if st.session_state.current_step < len(steps) - 1:
+            if st.button('Next'):
+                st.session_state.current_step += 1
+                render_step(st.session_state.current_step)
+
+# Initialize session state for current step
+if 'current_step' not in st.session_state:
+    st.session_state.current_step = 0
+
+# Render the content of the current step
+render_step(st.session_state.current_step)
+
+# Render the navigation buttons
+render_navigation_buttons()

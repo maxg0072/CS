@@ -239,7 +239,7 @@ def render_step(step):
                 else:
                         st.error("Please enter all required information in the previous steps.")
 
-# Display the content for the current step
+# Call the render_step function with the current step
 render_step(st.session_state.current_step)
 
 # Navigation Buttons
@@ -248,12 +248,12 @@ col1, col2 = st.columns(2)
 
 with col1:
     if st.session_state.current_step > 0:
-        if st.button("Previous"):
+        if st.button("Previous", key="prev_button"):
             st.session_state.current_step -= 1
             render_step(st.session_state.current_step)
 
 with col2:
-    if st.session_state.current_step < len(steps) - 1:
-        if st.button("Next"):
+    if st.session_state.current_step < 4:  # since there are 5 steps (0 to 4)
+        if st.button("Next", key="next_button"):
             st.session_state.current_step += 1
             render_step(st.session_state.current_step)

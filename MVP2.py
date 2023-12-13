@@ -200,16 +200,19 @@ def render_step(step, placeholder):
             # Step 1: Location
             address_input = st.text_input("Please enter an address or zip code in St. Gallen:", key="address_input_step1")
 
+            # Check if an address is entered, and use it to update the map
             if address_input:
                 st.session_state.address = address_input  # Store the address input
                 extracted_zip_code = extract_zip_from_address(address_input)
                 st.session_state.extracted_zip_code = extracted_zip_code  # Store the extracted zip code
-
-                # If an address is entered, use the entered address
                 lat, lon = get_lat_lon_from_address_or_zip(address_input) if extracted_zip_code else (default_lat, default_lon)
+                # Clear the existing map placeholder and create a new one for the updated map
+                placeholder.empty()
+                map_placeholder = st.empty()
             else:
-                # If no address is entered, use the default coordinates
+                # Use the default location
                 lat, lon = default_lat, default_lon
+                map_placeholder = placeholder
 
             # Display map with the given coordinates
             map = folium.Map(location=[lat, lon], zoom_start=16)
@@ -218,12 +221,14 @@ def render_step(step, placeholder):
                 popup=f"{'Entered address' if address_input else 'Default location'}",
                 icon=folium.Icon(color='red', icon="info-sign")
             ).add_to(map)
-            folium_static(map)
-            # If an address was entered and caused an error, show the error after the map
-            if address_input and not extracted_zip_code:
-                st.error("Please enter a valid address or zip code in St. Gallen.")
-            elif extracted_zip_code == "non-specific":
-                st.error("Please enter a more specific address or zip code in St. Gallen.")
+            folium_static(map_placeholder)
+
+            # Handle specific errors or messages after the map
+            if address_input:
+                if not extracted_zip_code:
+                    st.error("Please enter a valid address or zip code in St. Gallen.")
+                elif extracted_zip_code == "non-specific":
+                    st.error("Please enter a more specific address or zip code in St. Gallen.")
         
         elif step == 1:
             #step 2 rooms
@@ -251,20 +256,22 @@ def render_step(step, placeholder):
                             st.error("Please enter all required information in the previous steps.")
 
 # Function to render navigation buttons
-def render_navigation_buttons():
+def render_navigation_buttons(placeholder):
     col1, col2 = st.columns([1, 1])
     
     with col1:
         if st.session_state.current_step > 0:
             if st.button('Previous'):
                 st.session_state.current_step -= 1
-                st.experimental_rerun()  # Rerun the app to update the step
+                placeholder.empty()  # Clear the previous content
+                render_step(st.session_state.current_step, placeholder)
     
     with col2:
         if st.session_state.current_step < len(steps) - 1:
             if st.button('Next'):
                 st.session_state.current_step += 1
-                st.experimental_rerun()  # Rerun the app to update the step
+                placeholder.empty()  # Clear the previous content
+                render_step(st.session_state.current_step, placeholder)
 
 # Call the render_step function with the current step and the placeholder
 render_step(st.session_state.current_step, step_content)

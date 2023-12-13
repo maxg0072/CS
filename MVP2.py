@@ -200,35 +200,26 @@ def render_step(step, placeholder):
             # Step 1: Location
             address_input = st.text_input("Please enter an address or zip code in St. Gallen:", key="address_input_step1")
 
-            # Check if an address is entered, and use it to update the map
+            # Initial map display with default coordinates
+            lat, lon = default_lat, default_lon
+            map = folium.Map(location=[lat, lon], zoom_start=13)
+            folium.Marker([lat, lon], popup="Default Location").add_to(map)
+            folium_static(map)
+
+            # Update map with new coordinates if an address is entered
             if address_input:
-                st.session_state.address = address_input  # Store the address input
+                st.session_state.address = address_input
                 extracted_zip_code = extract_zip_from_address(address_input)
-                st.session_state.extracted_zip_code = extracted_zip_code  # Store the extracted zip code
-                lat, lon = get_lat_lon_from_address_or_zip(address_input) if extracted_zip_code else (default_lat, default_lon)
-                # Clear the existing map placeholder and create a new one for the updated map
-                placeholder.empty()
-                map_placeholder = st.empty()
-            else:
-                # Use the default location
-                lat, lon = default_lat, default_lon
-                map_placeholder = placeholder
+                st.session_state.extracted_zip_code = extracted_zip_code
 
-            # Display map with the given coordinates
-            map = folium.Map(location=[lat, lon], zoom_start=16)
-            folium.Marker(
-                [lat, lon],
-                popup=f"{'Entered address' if address_input else 'Default location'}",
-                icon=folium.Icon(color='red', icon="info-sign")
-            ).add_to(map)
-            folium_static(map_placeholder)
-
-            # Handle specific errors or messages after the map
-            if address_input:
-                if not extracted_zip_code:
+                if extracted_zip_code:
+                    lat, lon = get_lat_lon_from_address_or_zip(address_input)
+                    # Create a new map with updated coordinates
+                    map = folium.Map(location=[lat, lon], zoom_start=16)
+                    folium.Marker([lat, lon], popup="Entered Address").add_to(map)
+                    folium_static(map)  # Display the updated map
+                else:
                     st.error("Please enter a valid address or zip code in St. Gallen.")
-                elif extracted_zip_code == "non-specific":
-                    st.error("Please enter a more specific address or zip code in St. Gallen.")
         
         elif step == 1:
             #step 2 rooms

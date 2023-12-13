@@ -200,22 +200,11 @@ def render_step(step, placeholder):
             # Step 1: Location
             address_input = st.text_input("Please enter an address or zip code in St. Gallen:", key="address_input_step1")
 
-            # Create an initial map with default location
-            map = folium.Map(location=[default_lat, default_lon], zoom_start=16)
-            folium.Marker([default_lat, default_lon], popup="Default Location").add_to(map)
-            map_placeholder = folium_static(map)
+            # Initialize the map with default coordinates
+            lat, lon = default_lat, default_lon
+            popup_message = "Default Location"
 
-            # Function to update the map with a new location
-            def update_map(map_object, latitude, longitude, popup_message):
-                # Clear existing markers
-                map_object.clear_layers()
-                # Update map location
-                map_object.location = [latitude, longitude]
-                # Add new marker
-                folium.Marker([latitude, longitude], popup=popup_message).add_to(map_object)
-                return map_object
-
-            # Update map if an address is input
+            # Update the coordinates and popup message if an address is entered
             if address_input:
                 st.session_state.address = address_input
                 extracted_zip_code = extract_zip_from_address(address_input)
@@ -223,11 +212,14 @@ def render_step(step, placeholder):
 
                 if extracted_zip_code:
                     lat, lon = get_lat_lon_from_address_or_zip(address_input)
-                    # Update the map with the new location
-                    updated_map = update_map(map, lat, lon, "Entered Address")
-                    map_placeholder = folium_static(updated_map)
+                    popup_message = f"Eingegebene Adresse: {address_input}"
                 else:
                     st.error("Please enter a valid address or zip code in St. Gallen.")
+
+            # Create and display the map
+            map = folium.Map(location=[lat, lon], zoom_start=16)
+            folium.Marker([lat, lon], popup=popup_message, color = "red").add_to(map)
+            folium_static(map)
         
         
         elif step == 1:

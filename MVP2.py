@@ -199,14 +199,20 @@ def render_step(step, placeholder):
         if step == 0:
             # Step 1: Location
             address_input = st.text_input("Please enter an address or zip code in St. Gallen:", key="address_input_step1")
+            
+            # Placeholder for the map
+            map_placeholder = st.empty()
 
-            # Initial map display with default coordinates
-            lat, lon = default_lat, default_lon
-            map = folium.Map(location=[lat, lon], zoom_start=13)
-            folium.Marker([lat, lon], popup="Default Location").add_to(map)
-            folium_static(map)
+            # Function to display map
+            def display_map(latitude, longitude, popup_message="Default Location"):
+                map = folium.Map(location=[latitude, longitude], zoom_start=16)
+                folium.Marker([latitude, longitude], popup=popup_message).add_to(map)
+                folium_static(map_placeholder, map)
 
-            # Update map with new coordinates if an address is entered
+            # Display initial map with default location
+            display_map(default_lat, default_lon)
+
+            # Update map if address is input
             if address_input:
                 st.session_state.address = address_input
                 extracted_zip_code = extract_zip_from_address(address_input)
@@ -214,10 +220,8 @@ def render_step(step, placeholder):
 
                 if extracted_zip_code:
                     lat, lon = get_lat_lon_from_address_or_zip(address_input)
-                    # Create a new map with updated coordinates
-                    map = folium.Map(location=[lat, lon], zoom_start=16)
-                    folium.Marker([lat, lon], popup="Entered Address").add_to(map)
-                    folium_static(map)  # Display the updated map
+                    # Clear existing map and display new one
+                    display_map(lat, lon, "Entered Address")
                 else:
                     st.error("Please enter a valid address or zip code in St. Gallen.")
         

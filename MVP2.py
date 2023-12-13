@@ -169,6 +169,11 @@ def get_lat_lon_from_address_or_zip(input_text):
     else:
         return default_lat, default_lon  # Return default coordinates if no location is found
 
+
+def update_step(new_step):
+    st.session_state.current_step = new_step
+    st.experimental_rerun()
+
 # Preprocess data and train the model
 model = preprocess_and_train()
 
@@ -256,13 +261,9 @@ col1, col2 = st.columns(2)
 with col1:
     if st.session_state.current_step > 0:
         if st.button("Previous", key="prev_button"):
-            new_step = st.session_state.current_step - 1
-            st.session_state.current_step = new_step
-            st.rerun()
+            update_step(st.session_state.current_step - 1)
 
 with col2:
     if st.session_state.current_step < num_steps - 1:
         if st.button("Next", key="next_button"):
-            new_step = st.session_state.current_step + 1
-            st.session_state.current_step = new_step
-            st.rerun()
+            update_step(st.session_state.current_step + 1)

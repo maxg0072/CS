@@ -174,6 +174,11 @@ def update_step(new_step):
     st.session_state.current_step = new_step
     st.experimental_rerun()
 
+
+# Initialize session state for current step
+if 'current_step' not in st.session_state:
+    st.session_state.current_step = 0
+
 # Preprocess data and train the model
 model = preprocess_and_train()
 
@@ -183,84 +188,84 @@ st.title("Rental Price Prediction")
 # Define the steps
 steps = ["Location", "Rooms", "Size", "My Current Rent", "Results"]
 
-# Initialize session state for current step
+# Initialize session state for current step and create a placeholder for content
 if 'current_step' not in st.session_state:
     st.session_state.current_step = 0
+step_content = st.empty()
 
 # Function to render the content of each step
-def render_step(step):
-    if step == 0:
-        # Step 1: Location
-        address_input = st.text_input("Please enter an address or zip code in St. Gallen:", key="address_input_step1")
+def render_step(step, placeholder):
+    with placeholder.container():
+        if step == 0:
+            # Step 1: Location
+            address_input = st.text_input("Please enter an address or zip code in St. Gallen:", key="address_input_step1")
 
-        if address_input:
-            st.session_state.address = address_input  # Store the address input
-            extracted_zip_code = extract_zip_from_address(address_input)
-            st.session_state.extracted_zip_code = extracted_zip_code  # Store the extracted zip code
+            if address_input:
+                st.session_state.address = address_input  # Store the address input
+                extracted_zip_code = extract_zip_from_address(address_input)
+                st.session_state.extracted_zip_code = extracted_zip_code  # Store the extracted zip code
 
-            lat, lon = get_lat_lon_from_address_or_zip(address_input) if extracted_zip_code else (default_lat, default_lon)
+                lat, lon = get_lat_lon_from_address_or_zip(address_input) if extracted_zip_code else (default_lat, default_lon)
 
-            if extracted_zip_code == "non-specific":
-                st.error("Please enter a more specific address or zip code in St. Gallen.")
-            elif extracted_zip_code:
-                # Display map
-                map = folium.Map(location=[lat, lon], zoom_start=16)
-                folium.Marker(
-                    [lat, lon],
-                    popup=f"Eingegebene Adresse: {address_input}",
-                    icon=folium.Icon(color='red', icon="glyphicon glyphicon-menu-down")
-                ).add_to(map)
-                folium_static(map)
-            else:
-                st.error("Please enter a valid address or zip code in St. Gallen.")
-    
-    elif step == 1:
-        #step 2 rooms
-                st.session_state.rooms = st.selectbox("Select the number of rooms", range(1, 7), key='rooms_step2')
-
-        # Step 3: Size
-    elif step == 2:
-            st.session_state.size_m2 = st.number_input("Enter the size in square meters", min_value=0, key='size_m2_step3')
-
-        # Step 4: Current Rent
-    elif step == 3:
-            st.session_state.current_rent = st.number_input("Enter your current rent in CHF:", min_value=0, value=st.session_state.get('current_rent', 0), step=10, key = "current_rent_step4")
-
-        # Step 5: Result
-    elif step == 4:
-                if 'extracted_zip_code' in st.session_state and 'rooms' in st.session_state and 'size_m2' in st.session_state:
-                    # Use st.session_state variables for prediction
-                    if st.button('Predict Rental Price', key='predict_button'):
-                        predicted_price = predict_price(st.session_state.size_m2, st.session_state.extracted_zip_code, st.session_state.rooms, model)
-                        if predicted_price is not None:
-                            st.write(f"The predicted price for the apartment is CHF {predicted_price:.2f}")
-                        else:
-                            st.error("Unable to predict price. Please check your inputs.")
+                if extracted_zip_code == "non-specific":
+                    st.error("Please enter a more specific address or zip code in St. Gallen.")
+                elif extracted_zip_code:
+                    # Display map
+                    map = folium.Map(location=[lat, lon], zoom_start=16)
+                    folium.Marker(
+                        [lat, lon],
+                        popup=f"Eingegebene Adresse: {address_input}",
+                        icon=folium.Icon(color='red', icon="glyphicon glyphicon-menu-down")
+                    ).add_to(map)
+                    folium_static(map)
                 else:
-                        st.error("Please enter all required information in the previous steps.")
+                    st.error("Please enter a valid address or zip code in St. Gallen.")
+        
+        elif step == 1:
+            #step 2 rooms
+                    st.session_state.rooms = st.selectbox("Select the number of rooms", range(1, 7), key='rooms_step2')
+
+            # Step 3: Size
+        elif step == 2:
+                st.session_state.size_m2 = st.number_input("Enter the size in square meters", min_value=0, key='size_m2_step3')
+
+            # Step 4: Current Rent
+        elif step == 3:
+                st.session_state.current_rent = st.number_input("Enter your current rent in CHF:", min_value=0, value=st.session_state.get('current_rent', 0), step=10, key = "current_rent_step4")
+
+            # Step 5: Result
+        elif step == 4:
+                    if 'extracted_zip_code' in st.session_state and 'rooms' in st.session_state and 'size_m2' in st.session_state:
+                        # Use st.session_state variables for prediction
+                        if st.button('Predict Rental Price', key='predict_button'):
+                            predicted_price = predict_price(st.session_state.size_m2, st.session_state.extracted_zip_code, st.session_state.rooms, model)
+                            if predicted_price is not None:
+                                st.write(f"The predicted price for the apartment is CHF {predicted_price:.2f}")
+                            else:
+                                st.error("Unable to predict price. Please check your inputs.")
+                    else:
+                            st.error("Please enter all required information in the previous steps.")
 
 # Function to render navigation buttons
-def render_navigation_buttons():
+def render_navigation_buttons(placeholder):
     col1, col2 = st.columns([1, 1])
     
     with col1:
         if st.session_state.current_step > 0:
             if st.button('Previous'):
                 st.session_state.current_step -= 1
-                render_step(st.session_state.current_step)
+                placeholder.empty()  # Clear the previous content
+                render_step(st.session_state.current_step, placeholder)
     
     with col2:
         if st.session_state.current_step < len(steps) - 1:
             if st.button('Next'):
                 st.session_state.current_step += 1
-                render_step(st.session_state.current_step)
+                placeholder.empty()  # Clear the previous content
+                render_step(st.session_state.current_step, placeholder)
 
-# Initialize session state for current step
-if 'current_step' not in st.session_state:
-    st.session_state.current_step = 0
+# Call the render_step function with the current step and the placeholder
+render_step(st.session_state.current_step, step_content)
 
-# Render the content of the current step
-render_step(st.session_state.current_step)
-
-# Render the navigation buttons
-render_navigation_buttons()
+# Render the navigation buttons, pass the placeholder as well
+render_navigation_buttons(step_content)

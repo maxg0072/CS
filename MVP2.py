@@ -200,17 +200,15 @@ def render_step(step, placeholder):
             # Step 1: Location
             address_input = st.text_input("Please enter an address or zip code in St. Gallen:", key="address_input_step1")
             
-            # Placeholder for the map
-            map_placeholder = st.empty()
-
-            # Function to display map
-            def display_map(latitude, longitude, popup_message="Default Location"):
+            # Function to create and return a map
+            def create_map(latitude, longitude, popup_message="Default Location"):
                 map = folium.Map(location=[latitude, longitude], zoom_start=16)
                 folium.Marker([latitude, longitude], popup=popup_message).add_to(map)
-                folium_static(map_placeholder, map)
+                return map
 
             # Display initial map with default location
-            display_map(default_lat, default_lon)
+            initial_map = create_map(default_lat, default_lon)
+            folium_static(initial_map)
 
             # Update map if address is input
             if address_input:
@@ -220,8 +218,9 @@ def render_step(step, placeholder):
 
                 if extracted_zip_code:
                     lat, lon = get_lat_lon_from_address_or_zip(address_input)
-                    # Clear existing map and display new one
-                    display_map(lat, lon, "Entered Address")
+                    # Create and display new map
+                    updated_map = create_map(lat, lon, "Entered Address")
+                    folium_static(updated_map)
                 else:
                     st.error("Please enter a valid address or zip code in St. Gallen.")
         

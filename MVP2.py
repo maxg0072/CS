@@ -157,7 +157,7 @@ def extract_zip_from_address(address):
                 return component.strip()
     return None
 
-def get_lat_lon_from_address_or_zip(input_text):
+def get_lat_lon_from_address_or_zip(input_text):c
     geolocator = Nominatim(user_agent="http")
     # Add 'St. Gallen' suffix for zip codes to narrow down the search
     if input_text.isdigit() and len(input_text) == 4:

@@ -199,18 +199,23 @@ def render_step(step, placeholder):
         if step == 0:
             # Step 1: Location
             address_input = st.text_input("Please enter an address or zip code in St. Gallen:", key="address_input_step1")
-            
-            # Function to create and return a map
-            def create_map(latitude, longitude, popup_message="Default Location"):
-                map = folium.Map(location=[latitude, longitude], zoom_start=16)
-                folium.Marker([latitude, longitude], popup=popup_message).add_to(map)
-                return map
 
-            # Display initial map with default location
-            initial_map = create_map(default_lat, default_lon)
-            folium_static(initial_map)
+            # Create an initial map with default location
+            map = folium.Map(location=[default_lat, default_lon], zoom_start=16)
+            folium.Marker([default_lat, default_lon], popup="Default Location").add_to(map)
+            map_placeholder = folium_static(map)
 
-            # Update map if address is input
+            # Function to update the map with a new location
+            def update_map(map_object, latitude, longitude, popup_message):
+                # Clear existing markers
+                map_object.clear_layers()
+                # Update map location
+                map_object.location = [latitude, longitude]
+                # Add new marker
+                folium.Marker([latitude, longitude], popup=popup_message).add_to(map_object)
+                return map_object
+
+            # Update map if an address is input
             if address_input:
                 st.session_state.address = address_input
                 extracted_zip_code = extract_zip_from_address(address_input)
@@ -218,11 +223,12 @@ def render_step(step, placeholder):
 
                 if extracted_zip_code:
                     lat, lon = get_lat_lon_from_address_or_zip(address_input)
-                    # Create and display new map
-                    updated_map = create_map(lat, lon, "Entered Address")
-                    folium_static(updated_map)
+                    # Update the map with the new location
+                    updated_map = update_map(map, lat, lon, "Entered Address")
+                    map_placeholder = folium_static(updated_map)
                 else:
                     st.error("Please enter a valid address or zip code in St. Gallen.")
+        
         
         elif step == 1:
             #step 2 rooms

@@ -1,0 +1,41 @@
+def find_similar_properties(input_rooms, input_size, data, threshold=5):
+    similar_properties = data[
+        (data['Rooms'].between(input_rooms - 1, input_rooms + 1)) &
+        (data['Size_m2'].between(input_size - threshold, input_size + threshold)) 
+    ]
+    return similar_properties
+
+if st.button('Predict Rental Price'):
+    if extracted_zip_code:
+        predicted_price = predict_price(size_m2, extracted_zip_code, rooms, model)
+        if predicted_price is not None:
+            st.write(f"The predicted price for the apartment is CHF {predicted_price:.2f}")
+
+            # Ähnliche Immobilien finden und anzeigen
+            similar_properties = find_similar_properties(rooms, size_m2, real_estate_data)
+            if not similar_properties.empty:
+                st.markdown("### Ähnliche Immobilien:")
+                col1, col2 = st.columns(2)
+
+                # Beschränke die Anzeige auf die ersten 6 Immobilien
+                for index, row in similar_properties.head(6).iterrows():
+                    current_col = col1 if index % 2 == 0 else col2
+                    with current_col:
+                        website_url = row['Websiten'].lstrip('/')
+                        address = row['Col4'] if 'Col4' in row and row['Col4'] else 'Information not available'
+                        rooms_info = row['Rooms'] if 'Rooms' in row and row['Rooms'] else 'Information not available'
+
+                        st.markdown(
+                            f"<div style='border: 1px solid grey; border-radius: 5px; padding: 10px;'>"
+                            f"<b>Typ:</b> {row['Property_Type']} <br>"
+                            f"<b>Zimmer:</b> {rooms_info} <br>"
+                            f"<b>Größe:</b> {row['Size_m2']} Quadratmeter <br>"
+                            f"<b>Preis:</b> CHF {row['price_per_month']} pro Monat <br>"
+                            f"<b>Adresse:</b> {address} <br>"
+                            f"<b>Ort:</b> {row['area_code']} <br>"
+                            f"<b>Website:</b> <a href='http://{website_url}' target='_blank'>Link</a>"
+                            f"</div>",
+                            unsafe_allow_html=True
+                        )
+            else:
+                st.write("Keine ähnlichen Immobilien gefunden.")

@@ -256,13 +256,13 @@ col1, col2 = st.columns(2)
 with col1:
     if st.session_state.current_step > 0:
         if st.button("Previous", key="prev_button"):
-            st.session_state.current_step -= 1
+            new_step = st.session_state.current_step - 1
+            st.session_state.current_step = new_step
+            st.rerun()
 
 with col2:
     if st.session_state.current_step < num_steps - 1:
         if st.button("Next", key="next_button"):
-            st.session_state.current_step += 1
-
-# Update the selected tab after the button click
-if st.session_state.current_step != current_tab.index:
-    st.rerun()
+            new_step = st.session_state.current_step + 1
+            st.session_state.current_step = new_step
+            st.rerun()

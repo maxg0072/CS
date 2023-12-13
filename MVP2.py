@@ -199,20 +199,14 @@ def render_step(step, placeholder):
         if step == 0:
             # Step 1: Location
             address_input = st.text_input("Please enter an address or zip code in St. Gallen:", key="address_input_step1")
-            
-            # Placeholder specifically for the map
-            map_placeholder = st.empty()
 
-            # Function to display map
-            def display_map(latitude, longitude, message="Default Location"):
-                map = folium.Map(location=[latitude, longitude], zoom_start=16)
-                folium.Marker([latitude, longitude], popup=message).add_to(map)
-                folium_static(map_placeholder, map)
+            # Initial map display with default coordinates
+            lat, lon = default_lat, default_lon
+            map = folium.Map(location=[lat, lon], zoom_start=13)
+            folium.Marker([lat, lon], popup="Default Location").add_to(map)
+            folium_static(map)
 
-            # Display initial map with default location
-            display_map(default_lat, default_lon)
-
-            # Update map if address is input
+            # Update map with new coordinates if an address is entered
             if address_input:
                 st.session_state.address = address_input
                 extracted_zip_code = extract_zip_from_address(address_input)
@@ -220,9 +214,10 @@ def render_step(step, placeholder):
 
                 if extracted_zip_code:
                     lat, lon = get_lat_lon_from_address_or_zip(address_input)
-                    # Clear existing map and display new one
-                    map_placeholder.empty()
-                    display_map(lat, lon, "Entered Address")
+                    # Create a new map with updated coordinates
+                    map = folium.Map(location=[lat, lon], zoom_start=16)
+                    folium.Marker([lat, lon], popup="Entered Address").add_to(map)
+                    folium_static(map)  # Display the updated map
                 else:
                     st.error("Please enter a valid address or zip code in St. Gallen.")
         

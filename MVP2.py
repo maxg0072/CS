@@ -199,6 +199,10 @@ def render_step(step, placeholder):
         if step == 0:
             # Step 1: Location
             address_input = st.text_input("Please enter an address or zip code in St. Gallen:", key="address_input_step1")
+            # Display map with default location
+            map = folium.Map(location=[default_lat, default_lon], zoom_start=13)
+            folium.Marker([default_lat, default_lon], popup="Default Location").add_to(map)
+            folium_static(map)
 
             if address_input:
                 st.session_state.address = address_input  # Store the address input
@@ -210,12 +214,13 @@ def render_step(step, placeholder):
                 if extracted_zip_code == "non-specific":
                     st.error("Please enter a more specific address or zip code in St. Gallen.")
                 elif extracted_zip_code:
-                    # Display map
+                    # Clear the previous map and display new map with the given address
+                    placeholder.empty()
                     map = folium.Map(location=[lat, lon], zoom_start=16)
                     folium.Marker(
                         [lat, lon],
                         popup=f"Eingegebene Adresse: {address_input}",
-                        icon=folium.Icon(color='red', icon="glyphicon glyphicon-menu-down")
+                        icon=folium.Icon(color='red', icon="info-sign")
                     ).add_to(map)
                     folium_static(map)
                 else:

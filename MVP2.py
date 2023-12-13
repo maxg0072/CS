@@ -239,21 +239,28 @@ def render_step(step):
                 else:
                         st.error("Please enter all required information in the previous steps.")
 
-# Call the render_step function with the current step
+# Function to render navigation buttons
+def render_navigation_buttons():
+    col1, col2 = st.columns([1, 1])
+    
+    with col1:
+        if st.session_state.current_step > 0:
+            if st.button('Previous'):
+                st.session_state.current_step -= 1
+                render_step(st.session_state.current_step)
+    
+    with col2:
+        if st.session_state.current_step < len(steps) - 1:
+            if st.button('Next'):
+                st.session_state.current_step += 1
+                render_step(st.session_state.current_step)
+
+# Initialize session state for current step
+if 'current_step' not in st.session_state:
+    st.session_state.current_step = 0
+
+# Render the content of the current step
 render_step(st.session_state.current_step)
 
-# Navigation Buttons
-st.markdown("---")
-col1, col2 = st.columns(2)
-
-with col1:
-    if st.session_state.current_step > 0:
-        if st.button("Previous", key="prev_button"):
-            st.session_state.current_step -= 1
-            render_step(st.session_state.current_step)
-
-with col2:
-    if st.session_state.current_step < 4:  # since there are 5 steps (0 to 4)
-        if st.button("Next", key="next_button"):
-            st.session_state.current_step += 1
-            render_step(st.session_state.current_step)
+# Render the navigation buttons
+render_navigation_buttons()

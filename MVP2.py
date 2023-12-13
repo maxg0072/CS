@@ -174,6 +174,18 @@ def update_step(new_step):
     st.session_state.current_step = new_step
     st.experimental_rerun()
 
+# Function to process and localize the address input to St. Gallen
+def process_address_input(input_address):
+    # Define different variations of St. Gallen to check
+    st_gallen_variants = ['st. gallen', 'st gallen', 'sankt gallen', 'saint gallen']
+    
+    # Check if any variant of St. Gallen is already in the address
+    if any(variant in input_address.lower() for variant in st_gallen_variants):
+        # Address already contains a variant of St. Gallen
+        return input_address
+    else:
+        # Append "St. Gallen" to localize the search
+        return input_address + ", St. Gallen"
 
 # Initialize session state for current step
 if 'current_step' not in st.session_state:
@@ -206,9 +218,11 @@ def render_step(step, placeholder):
 
             # Update the coordinates and popup message if an address is entered
             if address_input:
-                st.session_state.address = address_input
-                extracted_zip_code = extract_zip_from_address(address_input)
+                processed_address = process_address_input(address_input)
+                st.session_state.address = processed_address
+                extracted_zip_code = extract_zip_from_address(processed_address)
                 st.session_state.extracted_zip_code = extracted_zip_code
+
 
                 if extracted_zip_code:
                     lat, lon = get_lat_lon_from_address_or_zip(address_input)

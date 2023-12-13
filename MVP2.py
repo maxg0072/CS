@@ -194,65 +194,65 @@ tabs = st.tabs(tab_titles)
 # Update the tab based on current step
 current_tab = tabs[st.session_state.current_step]
 
-# Step 1: Location
-if st.session_state.current_step == 0:
-    with tabs[0]:
-        address_input = st.text_input("Please enter an address or zip code in St. Gallen:", key="address_input_step1")
+with tabs[st.session_state.current_step]:
+        if st.session_state.current_step == 0:
+            with tabs[0]:
+                address_input = st.text_input("Please enter an address or zip code in St. Gallen:", key="address_input_step1")
 
-        # Only perform checks if an address has been entered
-        if address_input:
-            st.session_state.address = address_input  # Store the address input
-            extracted_zip_code = extract_zip_from_address(address_input)
-            st.session_state.extracted_zip_code = extracted_zip_code  # Store the extracted zip code
+                # Only perform checks if an address has been entered
+                if address_input:
+                    st.session_state.address = address_input  # Store the address input
+                    extracted_zip_code = extract_zip_from_address(address_input)
+                    st.session_state.extracted_zip_code = extracted_zip_code  # Store the extracted zip code
 
-            lat, lon = get_lat_lon_from_address_or_zip(address_input) if extracted_zip_code else (default_lat, default_lon)
+                    lat, lon = get_lat_lon_from_address_or_zip(address_input) if extracted_zip_code else (default_lat, default_lon)
 
-            if extracted_zip_code == "non-specific":
-                st.error("Please enter a more specific address or zip code in St. Gallen.")
-            elif extracted_zip_code:
-                # Display map
-                map = folium.Map(location=[lat, lon], zoom_start=16)
-                folium.Marker(
-                    [lat, lon],
-                    popup=f"Eingegebene Adresse: {address_input}",
-                    icon=folium.Icon(color='red', icon="glyphicon glyphicon-menu-down")
-                ).add_to(map)
-                folium_static(map)
-            else:
-                st.error("Please enter a valid address or zip code in St. Gallen.")
-        else:
-            # Reset to default coordinates if no address input yet
-            default_lat, default_lon = 47.424482, 9.376717
-            lat, lon = default_lat, default_lon
-
-# Step 2: Rooms
-elif st.session_state.current_step == 1:
-    with tabs[1]:
-        st.session_state.rooms = st.selectbox("Select the number of rooms", range(1, 7), key='rooms_step2')
-
-# Step 3: Size
-elif st.session_state.current_step == 2:
-    with tabs[2]:
-        st.session_state.size_m2 = st.number_input("Enter the size in square meters", min_value=0, key='size_m2_step3')
-
-# Step 4: Current Rent
-elif st.session_state.current_step == 3:
-    with tabs[3]:
-        st.session_state.current_rent = st.number_input("Enter your current rent in CHF:", min_value=0, value=st.session_state.get('current_rent', 0), step=10, key = "current_rent_step4")
-
-# Step 5: Result
-elif st.session_state.current_step == 4:
-    with tabs[4]:
-        if 'extracted_zip_code' in st.session_state and 'rooms' in st.session_state and 'size_m2' in st.session_state:
-            # Use st.session_state variables for prediction
-            if st.button('Predict Rental Price', key='predict_button'):
-                predicted_price = predict_price(st.session_state.size_m2, st.session_state.extracted_zip_code, st.session_state.rooms, model)
-                if predicted_price is not None:
-                    st.write(f"The predicted price for the apartment is CHF {predicted_price:.2f}")
+                    if extracted_zip_code == "non-specific":
+                        st.error("Please enter a more specific address or zip code in St. Gallen.")
+                    elif extracted_zip_code:
+                        # Display map
+                        map = folium.Map(location=[lat, lon], zoom_start=16)
+                        folium.Marker(
+                            [lat, lon],
+                            popup=f"Eingegebene Adresse: {address_input}",
+                            icon=folium.Icon(color='red', icon="glyphicon glyphicon-menu-down")
+                        ).add_to(map)
+                        folium_static(map)
+                    else:
+                        st.error("Please enter a valid address or zip code in St. Gallen.")
                 else:
-                    st.error("Unable to predict price. Please check your inputs.")
-        else:
-            st.error("Please enter all required information in the previous steps.")
+                    # Reset to default coordinates if no address input yet
+                    default_lat, default_lon = 47.424482, 9.376717
+                    lat, lon = default_lat, default_lon
+
+        # Step 2: Rooms
+        elif st.session_state.current_step == 1:
+            with tabs[1]:
+                st.session_state.rooms = st.selectbox("Select the number of rooms", range(1, 7), key='rooms_step2')
+
+        # Step 3: Size
+        elif st.session_state.current_step == 2:
+            with tabs[2]:
+                st.session_state.size_m2 = st.number_input("Enter the size in square meters", min_value=0, key='size_m2_step3')
+
+        # Step 4: Current Rent
+        elif st.session_state.current_step == 3:
+            with tabs[3]:
+                st.session_state.current_rent = st.number_input("Enter your current rent in CHF:", min_value=0, value=st.session_state.get('current_rent', 0), step=10, key = "current_rent_step4")
+
+        # Step 5: Result
+        elif st.session_state.current_step == 4:
+            with tabs[4]:
+                if 'extracted_zip_code' in st.session_state and 'rooms' in st.session_state and 'size_m2' in st.session_state:
+                    # Use st.session_state variables for prediction
+                    if st.button('Predict Rental Price', key='predict_button'):
+                        predicted_price = predict_price(st.session_state.size_m2, st.session_state.extracted_zip_code, st.session_state.rooms, model)
+                        if predicted_price is not None:
+                            st.write(f"The predicted price for the apartment is CHF {predicted_price:.2f}")
+                        else:
+                            st.error("Unable to predict price. Please check your inputs.")
+                else:
+                    st.error("Please enter all required information in the previous steps.")
 
 # Navigation Buttons
 st.markdown("---")
@@ -261,9 +261,9 @@ col1, col2 = st.columns(2)
 with col1:
     if st.session_state.current_step > 0:
         if st.button("Previous", key="prev_button"):
-            update_step(st.session_state.current_step - 1)
+            st.session_state.current_step -= 1
 
 with col2:
     if st.session_state.current_step < num_steps - 1:
         if st.button("Next", key="next_button"):
-            update_step(st.session_state.current_step + 1)
+            st.session_state.current_step += 1
